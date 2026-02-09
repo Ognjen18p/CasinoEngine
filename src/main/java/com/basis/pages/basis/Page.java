@@ -1,5 +1,10 @@
 package com.basis.pages.basis;
 
-public abstract class Page {
+import javafx.scene.layout.Pane;
 
+public abstract class Page {
+    protected Pane root;
+
+    protected abstract Pane createRoot();
+    protected
 }

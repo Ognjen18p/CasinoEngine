@@ -13,10 +13,26 @@ public class Player extends Person{
         this.successiveWins = successiveWins;
     }
 
-    public Player(int id, String name, String surname, String email, Role role, Date dateCreated, float balance, int successiveWins) {
-        super(id, name, surname, email, role, dateCreated);
+    public float getBalance() {
+        return balance;
+    }
+
+    public void setBalance(float balance) {
         this.balance = balance;
+    }
+
+    public int getSuccessiveWins() {
+        return successiveWins;
+    }
+
+    public void setSuccessiveWins(int successiveWins) {
         this.successiveWins = successiveWins;
+    }
+
+    public Player(int id, String name, String surname, String email, String username, String password, Role role, Date dateCreated, float balance, int successiveWins) {
+        super(id, name, surname, email, username, password, role, dateCreated);
+        this.balance = 0;
+        this.successiveWins = 0;
     }
 
     @Override
