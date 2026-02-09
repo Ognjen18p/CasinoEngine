@@ -1,5 +1,9 @@
 package main;
 
+import com.basis.pages.LoginPage;
+import com.controller.pages.LoginPageController;
+import com.stylization.pages.LoginPageStylization;
+import com.stylization.pages.PageStylization;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,22 +17,20 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Kreiranje UI elemenata
-        Label label = new Label("Dobrodošao u JavaFX!");
-        label.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        // Create LoginPage
+        LoginPage loginPage = new LoginPage();
 
-        Button button = new Button("Klikni me");
-        button.setOnAction(e -> label.setText("Kliknuto!"));
+        // Apply stylization
+        LoginPageStylization.styleLoginPage(loginPage);
 
-        // Layout
-        VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(label, button);
+        // Create controller (handles events)
+        LoginPageController controller = new LoginPageController(loginPage);
 
-        // Scena i Stage
-        Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("JavaFX Maven App");
+        // Create scene
+        Scene scene = new Scene(loginPage.getMainLayout(), 800, 600);
+
+        // Setup stage
+        primaryStage.setTitle("Casino Engine - Login");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
