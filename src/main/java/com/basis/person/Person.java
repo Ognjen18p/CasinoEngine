@@ -1,4 +1,4 @@
-package com.basis.person.basis;
+package com.basis.person;
 
 import java.util.Date;
 

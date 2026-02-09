@@ -1,4 +1,4 @@
-package com.basis.game.basis;
+package com.basis.game;
 
 public abstract class Game {
     protected int bet;

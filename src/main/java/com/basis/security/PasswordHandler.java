@@ -1,6 +1,6 @@
-package com.basis.security.basis;
+package com.basis.security;
 
-public class Password {
+public class PasswordHandler {
     public static final int min = 0;
     private String password;
 
