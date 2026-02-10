@@ -8,37 +8,31 @@ public class LoginPageStylization {
     public static void styleLoginPage(LoginPage loginPage) {
         VBox mainLayout = loginPage.getMainLayout();
 
-        // LAYOUT PROPERTIES
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setPrefSize(800, 600);
         mainLayout.setSpacing(20);
-        mainLayout.setStyle("-fx-background-color: #1a1a2e;"); // dark background
+        mainLayout.setStyle("-fx-background-color: grey;"); // dark background
 
-        // TITLE LABEL STYLING
         loginPage.getTitleLabel().setStyle(
                 "-fx-font-size: 36px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #eee;" +
+                        "-fx-text-fill: white;" +
                         "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.8), 10, 0, 0, 0);"
         );
 
-        // INPUT FIELDS STYLING
         String inputStyle =
                 "-fx-background-color: #16213e;" +
                         "-fx-text-fill: white;" +
                         "-fx-prompt-text-fill: #888;" +
-                        "-fx-border-color: #0f3460;" +
                         "-fx-border-width: 2;" +
                         "-fx-border-radius: 5;" +
                         "-fx-background-radius: 5;" +
                         "-fx-padding: 10;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-pref-width: 300px;";
+                        "-fx-font-size: 14px;";
 
         loginPage.getUsernameField().setStyle(inputStyle);
         loginPage.getPasswordField().setStyle(inputStyle);
 
-        // BUTTON STYLING
         String buttonStyle =
                 "-fx-background-color: #e94560;" +
                         "-fx-text-fill: white;" +
@@ -56,10 +50,9 @@ public class LoginPageStylization {
 
         loginPage.getLoginButton().setStyle(buttonStyle);
         loginPage.getRegisterButton().setStyle(
-                buttonStyle.replace("#e94560", "#533483") // purple for register
+                buttonStyle.replace("#e94560", "#533483")
         );
 
-        // HOVER EFFECTS
         loginPage.getLoginButton().setOnMouseEntered(e ->
                 loginPage.getLoginButton().setStyle(buttonStyle + buttonHoverStyle)
         );
@@ -78,27 +71,18 @@ public class LoginPageStylization {
                 )
         );
 
-        // BUTTON BOX STYLING
         loginPage.getButtonBox().setAlignment(Pos.CENTER);
         loginPage.getButtonBox().setSpacing(15);
 
-        // ERROR LABEL STYLING
         loginPage.getErrorMessageLabel().setStyle(
                 "-fx-text-fill: #ff4757;" +
                         "-fx-font-size: 14px;" +
                         "-fx-font-weight: bold;"
         );
 
-        // FOOTER LABEL STYLING
         loginPage.getFooterLabel().setStyle(
                 "-fx-text-fill: #666;" +
                         "-fx-font-size: 12px;"
-        );
-    }
-
-    public static void applyCSSStylization(LoginPage loginPage, String cssFilePath) {
-        loginPage.getMainLayout().getStylesheets().add(
-                PageStylization.class.getResource(cssFilePath).toExternalForm()
         );
     }
 }

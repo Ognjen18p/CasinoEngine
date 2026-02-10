@@ -17,19 +17,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Create LoginPage
         LoginPage loginPage = new LoginPage();
-
-        // Apply stylization
         LoginPageStylization.styleLoginPage(loginPage);
-
-        // Create controller (handles events)
         LoginPageController controller = new LoginPageController(loginPage);
 
-        // Create scene
         Scene scene = new Scene(loginPage.getMainLayout(), 800, 600);
 
-        // Setup stage
         primaryStage.setTitle("Casino Engine - Login");
         primaryStage.setScene(scene);
         primaryStage.show();

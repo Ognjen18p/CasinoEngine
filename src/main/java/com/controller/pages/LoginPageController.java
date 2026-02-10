@@ -2,12 +2,11 @@ package com.controller.pages;
 
 import com.basis.pages.LoginPage;
 import com.basis.person.Person;
-import com.basis.security.PasswordValidator;
-import com.basis.security.UsernameValidator;
+import com.basis.security.LoginValidator;
 
-///                                                                     ///
-/// ----- Login Controller handles logic for Login Page functions ---- ///
-///                                                                    ///
+///                                                                        ///
+/// ----- Login Controller handles logic for Login Page functionality ---- ///
+///                                                                        ///
 public class LoginPageController {
 
     private LoginPage loginPage;
@@ -30,30 +29,19 @@ public class LoginPageController {
         String username = loginPage.getUsernameField().getText();
         String password = loginPage.getPasswordField().getText();
 
-        if (!UsernameValidator.validateUsername(username)) {
-            loginPage.showErrorMessage("Username not valid");
+        if (!LoginValidator.findUsername(username)) {
             loginPage.resetInputFields();
+            loginPage.showErrorMessage(LoginValidator.getErrorMessage());
             return;
         }
-
-        if (!PasswordValidator.isPasswordValid(password)) {
-            loginPage.showErrorMessage("");
+        else if (!LoginValidator.findPassword(password)) {
             loginPage.resetInputFields();
-            return;
-        } else {
-            loginPage.showErrorMessage("Password not valid");
-            loginPage.resetInputFields();
+            loginPage.showErrorMessage(LoginValidator.getErrorMessage());
             return;
         }
     }
 
-    /**
-     * Handle register button click
-     */
     private void handleRegister() {
-        System.out.println("Navigating to Register page...");
 
-        // TODO: Switch to Register page
-        // SceneManager.getInstance().switchToRegisterPage();
     }
 }

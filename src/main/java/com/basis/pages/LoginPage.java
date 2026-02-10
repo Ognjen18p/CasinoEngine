@@ -87,6 +87,14 @@ public class LoginPage {
         this.errorMessageLabel.setText(errorMessage);
     }
 
+    public Label getTitleLabel() {
+        return titleLabel;
+    }
+
+    public void setTitleLabel(Label titleLabel) {
+        this.titleLabel = titleLabel;
+    }
+
     public void resetInputFields() {
         usernameField.clear();
         passwordField.clear();
