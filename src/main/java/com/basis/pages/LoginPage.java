@@ -1,5 +1,6 @@
 package com.basis.pages;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -8,91 +9,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class LoginPage {
-    private TextField usernameField;
-    private PasswordField passwordField;
-    private Button loginButton;
-    private Button registerButton;
-    private Label errorMessageLabel;
-    private Label footerLabel;
-    private Label titleLabel;
-    private VBox mainLayout;
-    private VBox buttonBox;
+public class LoginPage extends Page{
+    protected TextField usernameField;
+    protected PasswordField passwordField;
+    protected Button loginButton;
+    protected Button createAccountButton;
 
     public TextField getUsernameField() {
         return usernameField;
-    }
-
-    public void setUsernameField(TextField usernameField) {
-        this.usernameField = usernameField;
     }
 
     public PasswordField getPasswordField() {
         return passwordField;
     }
 
-    public void setPasswordField(PasswordField passwordField) {
-        this.passwordField = passwordField;
-    }
-
     public Button getLoginButton() {
         return loginButton;
     }
 
-    public void setLoginButton(Button loginButton) {
-        this.loginButton = loginButton;
-    }
-
-    public Button getRegisterButton() {
-        return registerButton;
-    }
-
-    public void setRegisterButton(Button registerButton) {
-        this.registerButton = registerButton;
-    }
-
-    public Label getErrorMessageLabel() {
-        return errorMessageLabel;
-    }
-
-    public void setErrorMessageLabel(Label errorMessageLabel) {
-        this.errorMessageLabel = errorMessageLabel;
-    }
-
-    public Label getFooterLabel() {
-        return footerLabel;
-    }
-
-    public void setFooterLabel(Label footerLabel) {
-        this.footerLabel = footerLabel;
-    }
-
-    public VBox getMainLayout() {
-        return mainLayout;
-    }
-
-    public void setMainLayout(VBox mainLayout) {
-        this.mainLayout = mainLayout;
-    }
-
-    public VBox getButtonBox() {
-        return buttonBox;
-    }
-
-    public void setButtonBox(VBox buttonBox) {
-        this.buttonBox = buttonBox;
-    }
-
-    public void showErrorMessage(String errorMessage) {
-        this.errorMessageLabel.setText(errorMessage);
-    }
-
-    public Label getTitleLabel() {
-        return titleLabel;
-    }
-
-    public void setTitleLabel(Label titleLabel) {
-        this.titleLabel = titleLabel;
+    public Button getCreateAccountButton() {
+        return createAccountButton;
     }
 
     public void resetInputFields() {
@@ -101,7 +37,7 @@ public class LoginPage {
         errorMessageLabel.setText("");
     }
 
-    private void initializeElements() {
+    protected void initializeElements() {
         titleLabel = new Label("CasinoEngine");
         errorMessageLabel = new Label("");
         footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");
@@ -113,12 +49,14 @@ public class LoginPage {
         passwordField.setPromptText("Password");
 
         loginButton = new Button("Login");
-        registerButton = new Button("Register");
+        createAccountButton = new Button("Create Account");
 
         mainLayout = new VBox(15);
         buttonBox = new VBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPrefSize(200, 200);
 
-        buttonBox.getChildren().addAll(loginButton, registerButton);
+        buttonBox.getChildren().addAll(loginButton, createAccountButton);
 
         mainLayout.getChildren().addAll(
                 titleLabel,
@@ -133,5 +71,4 @@ public class LoginPage {
     public LoginPage() {
         initializeElements();
     }
-
 }

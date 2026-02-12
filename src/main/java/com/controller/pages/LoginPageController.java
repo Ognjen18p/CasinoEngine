@@ -1,47 +1,69 @@
 package com.controller.pages;
 
 import com.basis.pages.LoginPage;
-import com.basis.person.Person;
 import com.basis.security.LoginValidator;
+import com.stylization.pages.LoginPageStylization;
+import javafx.scene.Scene;
+import main.GameManager;
 
-///                                                                        ///
-/// ----- Login Controller handles logic for Login Page functionality ---- ///
-///                                                                        ///
-public class LoginPageController {
+public class LoginPageController extends PageController {
 
     private LoginPage loginPage;
-    private Person person;
 
-    public LoginPageController(LoginPage loginPage) {
-        this.loginPage = loginPage;
+    public LoginPageController(GameManager gameManager) {
+        this.gameManager = gameManager;
+        initializePage();
         setupEventHandlers();
     }
 
-    private void setupEventHandlers() {
+    @Override
+    protected void initializePage() {
+        loginPage = new LoginPage();
+        scene = new Scene(loginPage.getMainLayout(), 900, 700);
+        LoginPageStylization loginPageStylization = new LoginPageStylization(loginPage);
+    }
+
+    @Override
+    protected void setupEventHandlers() {
         loginPage.getLoginButton().setOnAction(event -> handleLogin());
 
-        loginPage.getRegisterButton().setOnAction(event -> handleRegister());
+        loginPage.getCreateAccountButton().setOnAction(event -> handleCreateNew());
 
         loginPage.getPasswordField().setOnAction(event -> handleLogin());
     }
 
     private void handleLogin() {
-        String username = loginPage.getUsernameField().getText();
+        LoginValidator loginValidator = new LoginValidator();
+        String username = loginPage.getUsernameField().getText().trim();
         String password = loginPage.getPasswordField().getText();
 
-        if (!LoginValidator.findUsername(username)) {
-            loginPage.resetInputFields();
-            loginPage.showErrorMessage(LoginValidator.getErrorMessage());
+        if (username.isEmpty() || password.isEmpty()) {
+            loginPage.showErrorMessage("Username and password cannot be empty!");
             return;
         }
-        else if (!LoginValidator.findPassword(password)) {
+
+        if (!loginValidator.findUsername(username)) {
             loginPage.resetInputFields();
-            loginPage.showErrorMessage(LoginValidator.getErrorMessage());
+            loginPage.showErrorMessage(loginValidator.getErrorMessage());
             return;
         }
+
+        if (!loginValidator.findPassword(password)) {
+            loginPage.resetInputFields();
+            loginPage.showErrorMessage(loginValidator.getErrorMessage());
+            return;
+        }
+
+        loginPage.showErrorMessage("");
     }
 
-    private void handleRegister() {
+    @Override
+    public void showPage() {
+        gameManager.setMainScene(scene);
+        gameManager.getMainStage().setTitle("Casino Engine - Login");
+    }
 
+    private void handleCreateNew() {
+        gameManager.getRegistrationPageController().showPage();
     }
 }
