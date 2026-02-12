@@ -42,19 +42,10 @@ public class LoginPageController extends PageController {
             return;
         }
 
-        if (!loginValidator.findUsername(username)) {
-            loginPage.resetInputFields();
-            loginPage.showErrorMessage(loginValidator.getErrorMessage());
-            return;
-        }
-
-        if (!loginValidator.findPassword(password)) {
-            loginPage.resetInputFields();
-            loginPage.showErrorMessage(loginValidator.getErrorMessage());
-            return;
-        }
-
         loginPage.showErrorMessage("");
+        loginPage.resetInputFields();
+
+        gameManager.getMenuPageController().showPage();
     }
 
     @Override

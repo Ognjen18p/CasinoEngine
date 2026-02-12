@@ -1,6 +1,7 @@
 package main;
 
 import com.controller.pages.LoginPageController;
+import com.controller.pages.MenuPageController;
 import com.controller.pages.RegistrationPageController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -8,11 +9,13 @@ import javafx.stage.Stage;
 public class GameManager {
     private final LoginPageController loginPageController;
     private final RegistrationPageController registrationPageController;
+    private final MenuPageController menuPageController;
     private final Stage mainStage;
 
     public GameManager(){
         loginPageController = new LoginPageController(this);
         registrationPageController = new RegistrationPageController(this);
+        menuPageController = new MenuPageController(this);
         mainStage = new Stage();
         initializeGameManager();
     }
@@ -23,6 +26,10 @@ public class GameManager {
 
     public RegistrationPageController getRegistrationPageController() {
         return registrationPageController;
+    }
+
+    public MenuPageController getMenuPageController() {
+        return menuPageController;
     }
 
     public Stage getMainStage() {

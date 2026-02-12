@@ -1,10 +1,14 @@
 package com.basis.game;
 
+import javafx.scene.control.Button;
+
 public abstract class Game {
     protected int bet;
     protected int lastBet;
     protected int totalWin;
     protected int lastWin;
+
+    protected Button betButton;
 
     public Game(int bet, int lastBet, int totalWin, int lastWin) {
         this.bet = bet;
