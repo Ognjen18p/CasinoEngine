@@ -4,23 +4,24 @@ import com.basis.pages.RegistrationPage;
 import com.basis.person.Person;
 import com.basis.person.Player;
 import com.basis.security.RegistrationValidator;
+import com.controller.Controller;
 import com.stylization.pages.RegistrationPageStylization;
 import javafx.scene.Scene;
 import main.GameManager;
 import java.util.Date;
 
-public class RegistrationPageController extends PageController {
+public class RegistrationPageController extends Controller {
 
     private RegistrationPage registrationPage;
 
     public RegistrationPageController(GameManager gameManager) {
         this.gameManager = gameManager;
-        initializePage();
+        initializeScene();
         setupEventHandlers();
     }
 
     @Override
-    protected void initializePage(){
+    protected void initializeScene(){
         registrationPage = new RegistrationPage();
         scene = new Scene(registrationPage.getMainLayout(), 900, 700);
         RegistrationPageStylization registrationPageStylization = new RegistrationPageStylization(registrationPage);
@@ -126,13 +127,13 @@ public class RegistrationPageController extends PageController {
     }
 
     @Override
-    public void showPage() {
+    public void showScene() {
         gameManager.setMainScene(scene);
         gameManager.getMainStage().setTitle("Casino Engine - Register");
     }
 
     private void handleBackToLogin() {
-        gameManager.getLoginPageController().showPage();
+        gameManager.getLoginPageController().showScene();
     }
 
     private boolean usernameExists(String username) {

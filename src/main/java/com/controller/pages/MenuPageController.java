@@ -2,30 +2,31 @@ package com.controller.pages;
 
 import com.basis.pages.MenuPage;
 import com.basis.person.Player;
+import com.controller.Controller;
 import com.stylization.pages.MenuPageStylization;
 import javafx.scene.Scene;
 import main.GameManager;
 
-public class MenuPageController extends PageController {
+public class MenuPageController extends Controller {
     private MenuPage menuPage;
     private Player currentPlayer;
 
     public MenuPageController(GameManager gameManager) {
         this.gameManager = gameManager;
-        initializePage();
+        initializeScene();
         setupEventHandlers();
     }
 
     public MenuPageController(GameManager gameManager, Player player) {
         this.gameManager = gameManager;
         this.currentPlayer = player;
-        initializePage();
+        initializeScene();
         setupEventHandlers();
         updatePlayerInfo();
     }
 
     @Override
-    protected void initializePage() {
+    protected void initializeScene() {
         menuPage = new MenuPage();
         MenuPageStylization menuPageStylization = new MenuPageStylization(menuPage);
         scene = new Scene(menuPage.getMainLayout(), 1200, 800);
@@ -53,7 +54,7 @@ public class MenuPageController extends PageController {
     }
 
     @Override
-    public void showPage() {
+    public void showScene() {
         gameManager.setMainScene(scene);
         gameManager.getMainStage().setTitle("Casino Engine - Main Menu");
     }
@@ -63,7 +64,7 @@ public class MenuPageController extends PageController {
 
         menuPage.showErrorMessage("Logging out...");
 
-        gameManager.getLoginPageController().showPage();
+        gameManager.getLoginPageController().showScene();
     }
 
     private void handleDeposit() {
@@ -97,7 +98,7 @@ public class MenuPageController extends PageController {
     }
 
     private void handleBlackjackSelection() {
-        menuPage.showErrorMessage("Opening BlackJack...");
+        gameManager.getBlackJack().showScene();
     }
 
     private void handleRouletteSelection() {

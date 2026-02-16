@@ -1,4 +1,4 @@
 package com.stylization.game;
 
-public class GameStylization {
+public class SlotStylization {
 }

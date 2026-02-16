@@ -2,13 +2,8 @@ package com.stylization.pages;
 
 import com.basis.pages.MenuPage;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
 
 public class MenuPageStylization {
     private MenuPage menuPage;
@@ -149,7 +144,7 @@ public class MenuPageStylization {
                 "-fx-background-color: linear-gradient(to bottom, #4CAF50, #45a049);" +
                         "-fx-border-color: #66BB6A;";
 
-        Image blackjackImage = new Image(getClass().getResource("/images/blackjack.png").toExternalForm());
+        Image blackjackImage = new Image(getClass().getResource("/images/MenuGamesImages/blackjack.png").toExternalForm());
         ImageView blackjackIcon = new ImageView(blackjackImage);
         blackjackIcon.setFitWidth(200);
         blackjackIcon.setFitHeight(250);
@@ -161,7 +156,7 @@ public class MenuPageStylization {
                 menuPage.getBlackjackImageButton().setStyle(imageButtonStyle));
 
 
-        Image rouletteImage = new Image(getClass().getResource("/images/roulette.png").toExternalForm());
+        Image rouletteImage = new Image(getClass().getResource("/images/MenuGamesImages/roulette.png").toExternalForm());
         ImageView rouletteIcon = new ImageView(rouletteImage);
         rouletteIcon.setFitWidth(200);
         rouletteIcon.setFitHeight(250);
@@ -173,7 +168,7 @@ public class MenuPageStylization {
                 menuPage.getRouletteImageButton().setStyle(imageButtonStyle));
 
 
-        Image slotImage = new Image(getClass().getResource("/images/slot.png").toExternalForm());
+        Image slotImage = new Image(getClass().getResource("/images/MenuGamesImages/slot.png").toExternalForm());
         ImageView slotIcon = new ImageView(slotImage);
         slotIcon.setFitHeight(250);
         slotIcon.setFitWidth(200);

@@ -13,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class MenuPage extends Page {
-    // Top bar elements
     private Label balanceLabel;
     private Button logoutButton;
     private Button depositButton;

@@ -2,22 +2,23 @@ package com.controller.pages;
 
 import com.basis.pages.LoginPage;
 import com.basis.security.LoginValidator;
+import com.controller.Controller;
 import com.stylization.pages.LoginPageStylization;
 import javafx.scene.Scene;
 import main.GameManager;
 
-public class LoginPageController extends PageController {
+public class LoginPageController extends Controller {
 
     private LoginPage loginPage;
 
     public LoginPageController(GameManager gameManager) {
         this.gameManager = gameManager;
-        initializePage();
+        initializeScene();
         setupEventHandlers();
     }
 
     @Override
-    protected void initializePage() {
+    protected void initializeScene() {
         loginPage = new LoginPage();
         scene = new Scene(loginPage.getMainLayout(), 900, 700);
         LoginPageStylization loginPageStylization = new LoginPageStylization(loginPage);
@@ -45,16 +46,16 @@ public class LoginPageController extends PageController {
         loginPage.showErrorMessage("");
         loginPage.resetInputFields();
 
-        gameManager.getMenuPageController().showPage();
+        gameManager.getMenuPageController().showScene();
     }
 
     @Override
-    public void showPage() {
+    public void showScene() {
         gameManager.setMainScene(scene);
         gameManager.getMainStage().setTitle("Casino Engine - Login");
     }
 
     private void handleCreateNew() {
-        gameManager.getRegistrationPageController().showPage();
+        gameManager.getRegistrationPageController().showScene();
     }
 }
