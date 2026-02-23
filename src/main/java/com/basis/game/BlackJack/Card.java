@@ -1,12 +1,10 @@
 package com.basis.game.BlackJack;
 
-import com.basis.game.Game;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Card {
     public enum Rank {
-        ACE(11),
         TWO(2),
         THREE(3),
         FOUR(4),
@@ -18,7 +16,9 @@ public class Card {
         TEN(10),
         JACK(10),
         QUEEN(10),
-        KING(10);
+        KING(10),
+        ACE(11),
+        REDUCED(1);
 
         private final int value;
 
@@ -74,12 +74,22 @@ public class Card {
         image.setFitWidth(60);
     }
 
-    public Card(ImageView image) {
+    public Card(double xPos, double yPos) {
         rank = null;
         suit = null;
+        image = new ImageView();
+        image.setX(xPos);
+        image.setY(yPos);
+    }
+
+    public Card(ImageView image,Rank rank, Suit suit, double xPos, double yPos) {
         this.image = image;
-        image.setFitHeight(80);
-        image.setFitWidth(60);
+        this.image.setX(xPos);
+        this.image.setY(yPos);
+        this.image.setFitHeight(80);
+        this.image.setFitWidth(60);
+        this.rank = rank;
+        this.suit = suit;
     }
 
     public boolean moveToPosition(double xPos, double yPos, double moveSpeed, double deltaTime) {

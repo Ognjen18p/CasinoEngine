@@ -1,10 +1,8 @@
-package com.basis.game;
+package com.basis.game.Game;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 public abstract class Game {
 
@@ -13,7 +11,11 @@ public abstract class Game {
     protected Button exitButton;
     protected Label totalWinLabel;
     protected Label lastWinLabel;
+    protected Label textMessageLabel;
+    protected Label betLabel;
+    protected Label balanceLabel;
 
+    protected int balance;
     protected int bet;
     protected int lastBet;
     protected int totalWin;
@@ -23,6 +25,7 @@ public abstract class Game {
 
     protected void initializeElements() {
         bet = 0;
+        balance = 1000;
         lastBet = lastBet;
         totalWin = totalWin;
         lastWin = lastWin;
@@ -32,8 +35,7 @@ public abstract class Game {
         exitButton = new Button("Exit");
         totalWinLabel = new Label(Integer.toString(totalWin));
         lastWinLabel = new Label(Integer.toString(lastWin));
-
-        mainPane.getChildren().addAll(depositButton, exitButton,  totalWinLabel, lastWinLabel);
+        betLabel = new Label(Integer.toString(bet));
     }
 
     public int getBet() {
@@ -43,7 +45,8 @@ public abstract class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "bet=" + bet +
+                "balance=" + balance +
+                ", bet=" + bet +
                 ", lastBet=" + lastBet +
                 ", totalWin=" + totalWin +
                 ", lastWin=" + lastWin +
@@ -51,6 +54,7 @@ public abstract class Game {
     }
 
     public void setBet(int bet) {
+        betLabel.setText(Integer.toString(bet));
         this.bet = bet;
     }
 
@@ -68,6 +72,20 @@ public abstract class Game {
 
     public void setTotalWin(int totalWin) {
         this.totalWin = totalWin;
+        totalWinLabel.setText(Integer.toString(totalWin));
+    }
+
+    public Label getBalanceLabel() {
+        return balanceLabel;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
+        balanceLabel.setText(Integer.toString(balance));
     }
 
     public int getLastWin() {
@@ -108,6 +126,14 @@ public abstract class Game {
 
     public void setLastWinLabel(Label lastWinLabel) {
         this.lastWinLabel = lastWinLabel;
+    }
+
+    public Label getBetLabel() {
+        return betLabel;
+    }
+
+    public void setBetLabel(Label betLabel) {
+        this.betLabel = betLabel;
     }
 
     public Pane getMainPane() {

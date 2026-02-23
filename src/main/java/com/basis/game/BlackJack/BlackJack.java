@@ -1,117 +1,73 @@
 package com.basis.game.BlackJack;
 
-import com.basis.game.Game;
-import javafx.animation.ParallelTransition;
-import javafx.animation.RotateTransition;
-import javafx.animation.TranslateTransition;
-import javafx.scene.Scene;
+import com.basis.game.Game.Game;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Duration;
-import main.GameManager;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackJack extends Game {
+    public enum BlackJackWinState {
+        IN_PROGRESS,
+        PLAYER_BLACKJACK,
+        DEALER_BLACKJACK,
+        PUSH,
+        PLAYER_WINS,
+        DEALER_WINS
+    }
+
+    public enum BlackJackPhaseState {
+        DEAL,
+        HIT_STAND
+    }
+
+    private BlackJackWinState blackJackWinState = BlackJackWinState.IN_PROGRESS;
+    private BlackJackPhaseState blackJackPhaseState = BlackJackPhaseState.DEAL;
+
     private final int NUMBER_OF_RANKS = 13;
     private final int NUMBER_OF_SUITS = 4;
+    private final int NUMBER_OF_DECKS = 6;
+    private final int BLACKJACK = 21;
     private int playerScore = 0;
     private int dealerScore = 0;
     private int firstInDeck;
+    private int playerFreeSlot;
+    private int dealerFreeSlot;
 
     private Label placeYourBetsLabel;
+    private Label playerScoreLabel;
+    private Label dealerScoreLabel;
     private Button deal;
     private Button hit;
     private Button stand;
+    private ObservableList<Chip> owningChips;
+    private ArrayList<Chip> chosenChips;
     private ArrayList<Chip> bettingChips;
     private ArrayList<Card> deck;
     private Card dealersFlippedCard;
     private ArrayList<Card> dealerSlots;
     private ArrayList<Card> playerSlots;
-    private int playerFreeSlot;
-    private int dealerFreeSlot;
+    private ArrayList<Card> playerCards;
+    private ArrayList<Card> dealerCards;
+    private Button chipShopButton;
 
     public BlackJack() {
         initializeElements();
     }
 
-    @Override
-    protected void initializeElements() {
-        super.initializeElements();
-
-        dealerSlots = new ArrayList<>();
-        double padding = 350;
-        for(int nCard = 0; nCard < 21; nCard++) {
-            Card card = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())));
-            card.getImage().setX(padding);
-            card.getImage().setY(250);
-            padding+=50;
-            dealerSlots.add(card);
-            mainPane.getChildren().add(dealerSlots.getLast().getImage());
-        }
-        playerSlots = new ArrayList<>();
-        padding = 300;
-        for(int nCard = 0; nCard < 21; nCard++) {
-            Card card = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())));
-            card.getImage().setX(padding);
-            card.getImage().setY(150);
-            padding+=50;
-            playerSlots.add(card);
-            mainPane.getChildren().add(playerSlots.getLast().getImage());
-        }
-        deck = new ArrayList<>();
-        bettingChips = new ArrayList<>();
-
-        playerFreeSlot = 0;
-        dealerFreeSlot = 0;
-        firstInDeck = 0;
-
-        placeYourBetsLabel = new Label("Place your bets please");
-        placeYourBetsLabel.setTranslateX(500);
-        placeYourBetsLabel.setTranslateY(70);
-
-        totalWinLabel.setTranslateX(200);
-        totalWinLabel.setTranslateY(250);
-
-        lastWinLabel.setTranslateX(300);
-        lastWinLabel.setTranslateY(250);
-
-        depositButton.setTranslateX(100);
-        depositButton.setTranslateY(50);
-
-        exitButton.setTranslateX(700);
-        exitButton.setTranslateY(50);
-
-        deal = new Button("Deal");
-        deal.setTranslateX(300);
-        deal.setTranslateY(500);
-
-        hit = new Button("Hit");
-        hit.setTranslateX(300);
-        hit.setTranslateY(400);
-
-        stand = new Button("Stand");
-        stand.setTranslateX(500);
-        stand.setTranslateY(400);
-        hit.setVisible(false);
-        stand.setVisible(false);
-
-        dealersFlippedCard = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())));
-
-        fillBettingChips();
-
-        mainPane.getChildren().addAll(placeYourBetsLabel, deal, hit, stand);
-    }
-
     public void setPlayerScore(int playerScore) {
         this.playerScore = playerScore;
+        playerScoreLabel.setText(playerScore + "");
     }
 
     public void setDealerScore(int dealerScore) {
         this.dealerScore = dealerScore;
+        dealerScoreLabel.setText(dealerScore + "");
     }
 
     public void setPlayerFreeSlot(int playerFreeSlot) {
@@ -130,6 +86,31 @@ public class BlackJack extends Game {
         return NUMBER_OF_SUITS;
     }
 
+    public int getBLACKJACK() {
+        return BLACKJACK;
+    }
+
+    public int getNUMBER_OF_DECKS() {
+        return NUMBER_OF_DECKS;
+    }
+
+    public BlackJackWinState getBlackJackWinState() {
+        return blackJackWinState;
+    }
+
+    public void setBlackJackWinState(BlackJackWinState blackJackWinState) {
+        this.blackJackWinState = blackJackWinState;
+
+    }
+
+    public BlackJackPhaseState getBlackJackPhaseState() {
+        return blackJackPhaseState;
+    }
+
+    public void setBlackJackPhaseState(BlackJackPhaseState blackJackPhaseState) {
+        this.blackJackPhaseState = blackJackPhaseState;
+    }
+
     public int getPlayerScore() {
         return playerScore;
     }
@@ -142,24 +123,36 @@ public class BlackJack extends Game {
         return placeYourBetsLabel;
     }
 
-    public Button getDeal() {
+    public Label getPlayerScoreLabel() {
+        return playerScoreLabel;
+    }
+
+    public Label getDealerScoreLabel() {
+        return dealerScoreLabel;
+    }
+
+    public Button getDealButton() {
         return deal;
     }
 
-    public Button getHit() {
+    public Button getHitButton() {
         return hit;
     }
 
-    public Button getStand() {
+    public Button getStandButton() {
         return stand;
     }
 
-    public ArrayList<Chip> getBettingChips() {
-        return bettingChips;
+    public ObservableList<Chip> getOwningChips() {
+        return owningChips;
     }
 
     public ArrayList<Card> getDeck() {
         return deck;
+    }
+
+    public ArrayList<Chip> getBettingChips() {
+        return bettingChips;
     }
 
     public Card getDealersFlippedCard() {
@@ -186,36 +179,153 @@ public class BlackJack extends Game {
         return firstInDeck;
     }
 
+    public ArrayList<Card> getPlayerCards() {
+        return playerCards;
+    }
+
+    public ArrayList<Card> getDealerCards() {
+        return dealerCards;
+    }
+
+    public Button getChipShopButton() {
+        return chipShopButton;
+    }
+
     public void setFirstInDeck(int firstInDeck) {
         this.firstInDeck = firstInDeck;
     }
 
-    private void fillBettingChips() {
-        int[] bettingValues = {10, 20, 50, 100, 500};
-
+    private void fillOwningChips() {
         double padding = 100;
-        for (int bettingValue : bettingValues) {
+        for (int bettingValue : Chip.BETTING_VALUES) {
+            Chip emptyChip = new Chip(bettingValue, padding, 400, false);
+            owningChips.add(emptyChip);
+            padding += 80;
+        }
+        padding = 80;
+        for (int bettingValue : Chip.BETTING_VALUES) {
             Chip nChip = new Chip(bettingValue, padding, 400, true);
-            getBettingChips().add(nChip);
-            getMainPane().getChildren().add(getBettingChips().getLast().getButton());
+            owningChips.add(nChip);
+            mainPane.getChildren().add(owningChips.getLast().getButton());
             padding += 80;
         }
     }
 
     public void fillDeck() {
-        double deckPosX = 1000;
+        double deckPosX = 900;
         double deckPosY = 100;
-        for (int nDeck = 0; nDeck < 6; nDeck++) {
-            for (int nRank = 0; nRank < 13; nRank++) {
-                for (int nSuit = 0; nSuit < 4; nSuit++) {
+        for (int nDeck = 0; nDeck < NUMBER_OF_DECKS; nDeck++) {
+            for (int nRank = 0; nRank < NUMBER_OF_RANKS; nRank++) {
+                for (int nSuit = 0; nSuit < NUMBER_OF_SUITS; nSuit++) {
                     Card newCard = new Card(Card.Rank.values()[nRank], Card.Suit.values()[nSuit], deckPosX, deckPosY);
                     newCard.getImage().setRotate(20);
-                    getDeck().add(newCard);
-                    getMainPane().getChildren().add(getDeck().getLast().getImage());
+                    deck.add(newCard);
+                    mainPane.getChildren().add(newCard.getImage());
                 }
             }
         }
     }
+
+    public void fillCardSlots() {
+        double padding = 350;
+
+        dealerSlots = new ArrayList<>();
+        playerSlots = new ArrayList<>();
+
+        for (int nCard = 0; nCard < BLACKJACK; nCard++) {
+            Card card = new Card(padding, 150);
+            padding += 20;
+            dealerSlots.add(card);
+        }
+        padding = 300;
+        for (int nCard = 0; nCard < BLACKJACK; nCard++) {
+            Card card = new Card(padding, 250);
+            padding += 20;
+            playerSlots.add(card);
+        }
+    }
+
+    @Override
+    public void initializeElements() {
+        super.initializeElements();
+
+        fillCardSlots();
+        deck = new ArrayList<>();
+        playerCards = new ArrayList<>();
+        dealerCards = new ArrayList<>();
+
+        owningChips = FXCollections.observableArrayList();
+        bettingChips = new ArrayList<>();
+
+        bettingChips.add(new Chip(0, 100, 100, false));
+        fillOwningChips();
+
+        playerFreeSlot = 0;
+        dealerFreeSlot = 0;
+        firstInDeck = 0;
+
+        placeYourBetsLabel = new Label("Place your bets please");
+        placeYourBetsLabel.setTranslateX(500);
+        placeYourBetsLabel.setTranslateY(30);
+
+        playerScoreLabel = new Label("Player score: " + playerScore);
+        playerScoreLabel.setTranslateX(300);
+        playerScoreLabel.setTranslateY(170);
+
+        dealerScoreLabel = new Label("Dealer score: " + dealerScore);
+        dealerScoreLabel.setTranslateX(300);
+        dealerScoreLabel.setTranslateY(70);
+
+        totalWinLabel = new Label("Total win value: " + totalWin);
+        totalWinLabel.setTranslateX(200);
+        totalWinLabel.setTranslateY(250);
+
+        lastWinLabel = new Label("Last win value: " + lastWin);
+        lastWinLabel.setTranslateX(300);
+        lastWinLabel.setTranslateY(350);
+
+        betLabel = new Label(bet + " BET");
+        betLabel.setTranslateX(100);
+        betLabel.setTranslateY(350);
+
+        balanceLabel = new Label(balance + " BALANCE");
+        balanceLabel.setTranslateX(60);
+        balanceLabel.setTranslateY(50);
+
+        depositButton.setTranslateX(100);
+        depositButton.setTranslateY(50);
+
+        exitButton.setTranslateX(700);
+        exitButton.setTranslateY(50);
+
+        chipShopButton = new Button("Chip Shop");
+        chipShopButton.setTranslateX(700);
+        chipShopButton.setTranslateY(50);
+
+        deal = new Button("Deal");
+        deal.setTranslateX(300);
+        deal.setTranslateY(500);
+
+        hit = new Button("Hit");
+        hit.setTranslateX(300);
+        hit.setTranslateY(400);
+
+        stand = new Button("Stand");
+        stand.setTranslateX(500);
+        stand.setTranslateY(400);
+
+        hit.setVisible(false);
+        stand.setVisible(false);
+        deal.setVisible(false);
+
+        dealersFlippedCard = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
+
+        mainPane.getChildren().addAll(depositButton, exitButton, chipShopButton, balanceLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
+                deal, hit, stand, bettingChips.getFirst().getImage());
+
+        blackJackPhaseState = BlackJackPhaseState.DEAL;
+    }
+
 }
 
 
