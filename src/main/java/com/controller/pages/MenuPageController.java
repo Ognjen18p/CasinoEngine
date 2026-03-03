@@ -98,11 +98,11 @@ public class MenuPageController extends Controller {
     }
 
     private void handleBlackjackSelection() {
-        gameManager.getBlackJack().showScene();
+        gameManager.getBlackJackController().showScene();
     }
 
     private void handleRouletteSelection() {
-        menuPage.showErrorMessage("Roulette coming soon!");
+        gameManager.getRouletteController().showScene();
     }
 
     private void handleSlotsSelection() {

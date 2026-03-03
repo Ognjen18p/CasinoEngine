@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 
 public class Card {
     public enum Rank {
+        ONE(1),
         TWO(2),
         THREE(3),
         FOUR(4),
@@ -17,8 +18,7 @@ public class Card {
         JACK(10),
         QUEEN(10),
         KING(10),
-        ACE(11),
-        REDUCED(1);
+        ACE(11);
 
         private final int value;
 

@@ -47,6 +47,7 @@ public class BlackJackStylization {
         blackJack.getPlaceYourBetsLabel().setStyle(style);
         blackJack.getPlayerScoreLabel().setStyle(style);
         blackJack.getDealerScoreLabel().setStyle(style);
+        blackJack.getWinLabel().setStyle(style);
         blackJack.getLastWinLabel().setStyle(style);
         blackJack.getTotalWinLabel().setStyle(style);
         blackJack.getBetLabel().setStyle(style);

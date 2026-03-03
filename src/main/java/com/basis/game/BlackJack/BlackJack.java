@@ -45,11 +45,8 @@ public class BlackJack extends Game {
     private Button deal;
     private Button hit;
     private Button stand;
-    private ObservableList<Chip> owningChips;
-    private ArrayList<Chip> chosenChips;
-    private ArrayList<Chip> bettingChips;
-    private ArrayList<Card> deck;
     private Card dealersFlippedCard;
+    private ArrayList<Card> deck;
     private ArrayList<Card> dealerSlots;
     private ArrayList<Card> playerSlots;
     private ArrayList<Card> playerCards;
@@ -143,16 +140,8 @@ public class BlackJack extends Game {
         return stand;
     }
 
-    public ObservableList<Chip> getOwningChips() {
-        return owningChips;
-    }
-
     public ArrayList<Card> getDeck() {
         return deck;
-    }
-
-    public ArrayList<Chip> getBettingChips() {
-        return bettingChips;
     }
 
     public Card getDealersFlippedCard() {
@@ -195,18 +184,11 @@ public class BlackJack extends Game {
         this.firstInDeck = firstInDeck;
     }
 
-    private void fillOwningChips() {
+    private void fillChipsSlots() {
         double padding = 100;
-        for (int bettingValue : Chip.BETTING_VALUES) {
+        for (int bettingValue : Chip.CHIP_VALUES) {
             Chip emptyChip = new Chip(bettingValue, padding, 400, false);
             owningChips.add(emptyChip);
-            padding += 80;
-        }
-        padding = 80;
-        for (int bettingValue : Chip.BETTING_VALUES) {
-            Chip nChip = new Chip(bettingValue, padding, 400, true);
-            owningChips.add(nChip);
-            mainPane.getChildren().add(owningChips.getLast().getButton());
             padding += 80;
         }
     }
@@ -215,7 +197,7 @@ public class BlackJack extends Game {
         double deckPosX = 900;
         double deckPosY = 100;
         for (int nDeck = 0; nDeck < NUMBER_OF_DECKS; nDeck++) {
-            for (int nRank = 0; nRank < NUMBER_OF_RANKS; nRank++) {
+            for (int nRank = 1; nRank < NUMBER_OF_RANKS; nRank++) {
                 for (int nSuit = 0; nSuit < NUMBER_OF_SUITS; nSuit++) {
                     Card newCard = new Card(Card.Rank.values()[nRank], Card.Suit.values()[nSuit], deckPosX, deckPosY);
                     newCard.getImage().setRotate(20);
@@ -258,7 +240,7 @@ public class BlackJack extends Game {
         bettingChips = new ArrayList<>();
 
         bettingChips.add(new Chip(0, 100, 100, false));
-        fillOwningChips();
+        fillChipsSlots();
 
         playerFreeSlot = 0;
         dealerFreeSlot = 0;
@@ -275,6 +257,10 @@ public class BlackJack extends Game {
         dealerScoreLabel = new Label("Dealer score: " + dealerScore);
         dealerScoreLabel.setTranslateX(300);
         dealerScoreLabel.setTranslateY(70);
+
+        winLabel = new Label("Win: " + win);
+        winLabel.setTranslateX(120);
+        winLabel.setTranslateY(500);
 
         totalWinLabel = new Label("Total win value: " + totalWin);
         totalWinLabel.setTranslateX(200);
@@ -320,7 +306,7 @@ public class BlackJack extends Game {
 
         dealersFlippedCard = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
 
-        mainPane.getChildren().addAll(depositButton, exitButton, chipShopButton, balanceLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
+        mainPane.getChildren().addAll(depositButton, exitButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
                 deal, hit, stand, bettingChips.getFirst().getImage());
 
         blackJackPhaseState = BlackJackPhaseState.DEAL;

@@ -54,7 +54,7 @@ public class ChipShop {
 
     private void fillShopChipsAndEvents() {
         availableChips = new ArrayList<>();
-        for (int bettingValue : Chip.BETTING_VALUES) {
+        for (int bettingValue : Chip.CHIP_VALUES) {
             VBox boxPane = new VBox(4);
             boxPane.setPadding(new Insets(6));
             boxPane.setStyle(
@@ -84,7 +84,7 @@ public class ChipShop {
             Button plus = new Button("+");
             plus.setStyle(shopButtonStyle());
 
-            plus.setOnMouseClicked(e -> {
+            plus.setOnMouseClicked(event -> {
                 if (game.getBalance() > bettingValue) {
                     Chip newChip = new Chip(bettingValue, 0, 0, true);
                     game.getMainPane().getChildren().add(newChip.getButton());
@@ -93,7 +93,7 @@ public class ChipShop {
                 }
             });
 
-            minus.setOnMouseClicked(e -> {
+            minus.setOnMouseClicked(event -> {
                 for (Chip chip : destinationChips) {
                     if (chip.getValue() == bettingValue && chip.getButton() != null) {
                         removeChipTransition(chip);
@@ -119,6 +119,8 @@ public class ChipShop {
             }
         }
         if (destinationChip == null) return;
+        chip.getButton().setTranslateX(0);
+        chip.getButton().setTranslateY(0);
         transition.setByX(destinationChip.getImage().getX() - chip.getButton().getLayoutX());
         transition.setByY(destinationChip.getImage().getY() - chip.getButton().getLayoutY());
         transition.setOnFinished(event -> destinationChips.add(chip));
@@ -128,6 +130,8 @@ public class ChipShop {
     private void removeChipTransition(Chip chip) {
         TranslateTransition transition = new TranslateTransition(Duration.millis(1000), chip.getButton());
         if (chip.getButton() == null) return;
+        chip.getButton().setTranslateX(0);
+        chip.getButton().setTranslateY(0);
         transition.setByX(pane.getLayoutX() - chip.getButton().getLayoutX());
         transition.setByY(pane.getLayoutY() - chip.getButton().getLayoutY());
         transition.setOnFinished(event -> {

@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Chip {
-    public static final int[] BETTING_VALUES = {5, 10, 50, 100, 500};
+    public static final int[] CHIP_VALUES = {5, 10, 50, 100, 500};
 
     private final int value;
     private boolean isSelected;

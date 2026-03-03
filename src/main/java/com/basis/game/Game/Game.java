@@ -1,23 +1,30 @@
 package com.basis.game.Game;
 
+import com.basis.game.BlackJack.Chip;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
-public abstract class Game {
+import java.util.ArrayList;
 
+public abstract class Game {
     protected Pane mainPane;
     protected Button depositButton;
     protected Button exitButton;
-    protected Label totalWinLabel;
+    protected Label winLabel;
     protected Label lastWinLabel;
+    protected Label totalWinLabel;
     protected Label textMessageLabel;
     protected Label betLabel;
     protected Label balanceLabel;
+    protected ObservableList<Chip> owningChips;
+    protected ArrayList<Chip> bettingChips;
 
     protected int balance;
     protected int bet;
     protected int lastBet;
+    protected int win;
     protected int totalWin;
     protected int lastWin;
 
@@ -29,6 +36,7 @@ public abstract class Game {
         lastBet = lastBet;
         totalWin = totalWin;
         lastWin = lastWin;
+        win = 0;
 
         mainPane = new Pane();
         depositButton = new Button("Deposit");
@@ -68,6 +76,23 @@ public abstract class Game {
 
     public int getTotalWin() {
         return totalWin;
+    }
+
+    public int getWin() {
+        return win;
+    }
+
+    public void setWin(int win) {
+        this.win = win;
+        winLabel.setText(Integer.toString(win));
+    }
+
+    public Label getWinLabel() {
+        return winLabel;
+    }
+
+    public Label getTextMessageLabel() {
+        return textMessageLabel;
     }
 
     public void setTotalWin(int totalWin) {
@@ -138,6 +163,14 @@ public abstract class Game {
 
     public Pane getMainPane() {
         return mainPane;
+    }
+
+    public ObservableList<Chip> getOwningChips() {
+        return owningChips;
+    }
+
+    public ArrayList<Chip> getBettingChips() {
+        return bettingChips;
     }
 
     public void setMainPane(Pane mainPane) {

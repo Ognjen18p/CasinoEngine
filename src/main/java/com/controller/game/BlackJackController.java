@@ -48,7 +48,6 @@ public class BlackJackController extends Controller {
     @Override
     protected void initializeScene() {
         blackJack = new BlackJack();
-        blackJack.getPlaceYourBetsLabel().setVisible(true);
 
         chipShop = new ChipShop(blackJack, blackJack.getOwningChips());
         blackJack.getMainPane().getChildren().add(chipShop.getPane());
@@ -241,7 +240,7 @@ public class BlackJackController extends Controller {
                 for (Card nCard : blackJack.getPlayerSlots()) {
                     if (nCard.getRank() == Card.Rank.ACE) {
                         blackJack.setPlayerScore(blackJack.getPlayerScore() + card.getRank().getValue() - 10);
-                        nCard.setRank(Card.Rank.REDUCED);
+                        nCard.setRank(Card.Rank.ONE);
                         return;
                     }
                 }
@@ -258,7 +257,7 @@ public class BlackJackController extends Controller {
                 for (Card nCard : blackJack.getDealerSlots()) {
                     if (nCard.getRank() == Card.Rank.ACE) {
                         blackJack.setPlayerScore(blackJack.getDealerScore() + card.getRank().getValue() - 10);
-                        nCard.setRank(Card.Rank.REDUCED);
+                        nCard.setRank(Card.Rank.ONE);
                         return;
                     }
                 }
@@ -409,6 +408,7 @@ public class BlackJackController extends Controller {
                 blackJack.getOwningChips().add(aChip);
             }
             blackJack.setBalance(blackJack.getBalance() + blackJack.getBet());
+            blackJack.setWin(0);
         });
         return sequentialTransition;
     }
@@ -437,6 +437,7 @@ public class BlackJackController extends Controller {
                 if (blackJack.getBlackJackWinState() == BlackJack.BlackJackWinState.PLAYER_BLACKJACK)
                     addBalance = ((int) (blackJack.getBet() * 2.5));
 
+                blackJack.setWin(addBalance);
                 blackJack.setLastWin(addBalance);
                 blackJack.setTotalWin(blackJack.getTotalWin() + addBalance);
                 blackJack.setBalance(blackJack.getBalance() + addBalance);
@@ -464,6 +465,7 @@ public class BlackJackController extends Controller {
             for (Chip rChip : removeChips) {
                 blackJack.getBettingChips().remove(rChip);
                 blackJack.getMainPane().getChildren().remove(rChip.getButton());
+                blackJack.setWin(0);
             }
         });
         return sequentialTransition;
