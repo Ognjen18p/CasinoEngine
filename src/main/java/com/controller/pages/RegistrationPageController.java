@@ -23,7 +23,7 @@ public class RegistrationPageController extends Controller {
     @Override
     protected void initializeScene(){
         registrationPage = new RegistrationPage();
-        scene = new Scene(registrationPage.getMainLayout(), 900, 700);
+        scene = new Scene(registrationPage.getMainLayout(), 1000, 800);
         RegistrationPageStylization registrationPageStylization = new RegistrationPageStylization(registrationPage);
     }
 

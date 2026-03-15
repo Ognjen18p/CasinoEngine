@@ -1,4 +1,4 @@
-package com.basis.game.Roulette;
+package com.basis.game.essentials;
 
 public class Vector2 {
     private double x, y;
@@ -11,6 +11,14 @@ public class Vector2 {
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return "Vector2{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 
     public double getX() {
@@ -114,5 +122,16 @@ public class Vector2 {
 
     public Vector2 normalize() {
         return normalize(this);
+    }
+
+
+    /// DISTANCE ///
+
+    public static double distance(Vector2 vector1, Vector2 vector2) {
+        return Math.sqrt(Math.pow(vector2.x - vector1.x, 2) + Math.pow(vector2.y - vector1.y, 2));
+    }
+
+    public double distance(Vector2 vector) {
+        return distance(this, vector);
     }
 }

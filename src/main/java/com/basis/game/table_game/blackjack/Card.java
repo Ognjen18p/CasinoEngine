@@ -1,4 +1,4 @@
-package com.basis.game.BlackJack;
+package com.basis.game.table_game.blackjack;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

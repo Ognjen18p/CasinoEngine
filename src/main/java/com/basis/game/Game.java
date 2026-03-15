@@ -1,12 +1,8 @@
-package com.basis.game.Game;
+package com.basis.game;
 
-import com.basis.game.BlackJack.Chip;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-
-import java.util.ArrayList;
 
 public abstract class Game {
     protected Pane mainPane;
@@ -18,8 +14,6 @@ public abstract class Game {
     protected Label textMessageLabel;
     protected Label betLabel;
     protected Label balanceLabel;
-    protected ObservableList<Chip> owningChips;
-    protected ArrayList<Chip> bettingChips;
 
     protected int balance;
     protected int bet;
@@ -46,10 +40,6 @@ public abstract class Game {
         betLabel = new Label(Integer.toString(bet));
     }
 
-    public int getBet() {
-        return bet;
-    }
-
     @Override
     public String toString() {
         return "Game{" +
@@ -62,8 +52,12 @@ public abstract class Game {
     }
 
     public void setBet(int bet) {
-        betLabel.setText(Integer.toString(bet));
+        betLabel.setText(Integer.toString(bet)+ " BET");
         this.bet = bet;
+    }
+
+    public int getBet() {
+        return bet;
     }
 
     public int getLastBet() {
@@ -84,7 +78,7 @@ public abstract class Game {
 
     public void setWin(int win) {
         this.win = win;
-        winLabel.setText(Integer.toString(win));
+        winLabel.setText(Integer.toString(win)+ " WIN");
     }
 
     public Label getWinLabel() {
@@ -97,7 +91,7 @@ public abstract class Game {
 
     public void setTotalWin(int totalWin) {
         this.totalWin = totalWin;
-        totalWinLabel.setText(Integer.toString(totalWin));
+        totalWinLabel.setText(Integer.toString(totalWin)+ " TOTAL WIN");
     }
 
     public Label getBalanceLabel() {
@@ -110,7 +104,7 @@ public abstract class Game {
 
     public void setBalance(int balance) {
         this.balance = balance;
-        balanceLabel.setText(Integer.toString(balance));
+        balanceLabel.setText(Integer.toString(balance) + " BALANCE");
     }
 
     public int getLastWin() {
@@ -163,14 +157,6 @@ public abstract class Game {
 
     public Pane getMainPane() {
         return mainPane;
-    }
-
-    public ObservableList<Chip> getOwningChips() {
-        return owningChips;
-    }
-
-    public ArrayList<Chip> getBettingChips() {
-        return bettingChips;
     }
 
     public void setMainPane(Pane mainPane) {

@@ -1,7 +1,10 @@
-package com.basis.game.Game;
+package com.basis.game.table_game;
 
-import com.basis.game.BlackJack.Chip;
-import javafx.animation.TranslateTransition;
+import com.basis.game.Game;
+import com.basis.game.table_game.blackjack.Chip;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -13,29 +16,30 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 
 public class ChipShop {
-    private Game game;
-    private HBox pane;
+    private final Game game;
+    private final HBox mainPane;
     private ArrayList<Chip> availableChips;
-    private ObservableList<Chip> destinationChips;
+    private final ObservableList<Chip> destinationChips;
 
-    public ChipShop(Game game, ObservableList<Chip> destinationChips) {
+    public ChipShop(TableGame game) {
         this.game = game;
-        this.destinationChips = destinationChips;
-        pane = new HBox(10);
-        pane.setPadding(new Insets(10));
-        pane.setStyle(
+        this.destinationChips = game.getOwningChips();
+        mainPane = new HBox(10);
+        mainPane.setPadding(new Insets(10));
+        mainPane.setStyle(
                 "-fx-background-color: rgba(0,0,0,0.75);" +
                         "-fx-background-radius: 12;" +
                         "-fx-border-color: #FFD700;" +
                         "-fx-border-radius: 12;" +
                         "-fx-border-width: 2;"
         );
-
+        mainPane.setVisible(false);
+        game.getMainPane().getChildren().add(mainPane);
         fillShopChipsAndEvents();
     }
 
-    public HBox getPane() {
-        return pane;
+    public HBox getMainPane() {
+        return mainPane;
     }
 
     private String shopButtonStyle() {
@@ -105,12 +109,11 @@ public class ChipShop {
 
             buttons.getChildren().addAll(minus, plus);
             boxPane.getChildren().addAll(valueLabel, nChip.getImage(), buttons);
-            pane.getChildren().add(boxPane);
+            mainPane.getChildren().add(boxPane);
         }
     }
 
     private void addChipTransition(Chip chip) {
-        TranslateTransition transition = new TranslateTransition(Duration.millis(1000), chip.getButton());
         Chip destinationChip = null;
         for (Chip nChip : destinationChips) {
             if (nChip.getButton() == null && chip.getValue() == nChip.getValue()) {
@@ -121,19 +124,24 @@ public class ChipShop {
         if (destinationChip == null) return;
         chip.getButton().setTranslateX(0);
         chip.getButton().setTranslateY(0);
-        transition.setByX(destinationChip.getImage().getX() - chip.getButton().getLayoutX());
-        transition.setByY(destinationChip.getImage().getY() - chip.getButton().getLayoutY());
+        Timeline transition = new Timeline(
+                new KeyFrame(Duration.millis(300),
+                new KeyValue(chip.getButton().layoutXProperty(), destinationChip.getImage().getX()),
+                new KeyValue(chip.getButton().layoutYProperty(), destinationChip.getImage().getY())
+        ));
         transition.setOnFinished(event -> destinationChips.add(chip));
         transition.play();
     }
 
     private void removeChipTransition(Chip chip) {
-        TranslateTransition transition = new TranslateTransition(Duration.millis(1000), chip.getButton());
         if (chip.getButton() == null) return;
         chip.getButton().setTranslateX(0);
         chip.getButton().setTranslateY(0);
-        transition.setByX(pane.getLayoutX() - chip.getButton().getLayoutX());
-        transition.setByY(pane.getLayoutY() - chip.getButton().getLayoutY());
+        Timeline transition = new Timeline(
+                new KeyFrame(Duration.millis(300),
+                        new KeyValue(chip.getButton().layoutXProperty(), mainPane.getLayoutX()),
+                        new KeyValue(chip.getButton().layoutYProperty(), mainPane.getLayoutY())
+                ));
         transition.setOnFinished(event -> {
             destinationChips.remove(chip);
             game.getMainPane().getChildren().remove(chip.getButton());

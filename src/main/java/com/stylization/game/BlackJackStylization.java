@@ -1,10 +1,8 @@
 package com.stylization.game;
 
-import com.basis.game.BlackJack.BlackJack;
-import com.basis.game.BlackJack.Chip;
+import com.basis.game.table_game.blackjack.BlackJack;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;

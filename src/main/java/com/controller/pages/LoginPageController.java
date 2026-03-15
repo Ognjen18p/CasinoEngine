@@ -20,7 +20,7 @@ public class LoginPageController extends Controller {
     @Override
     protected void initializeScene() {
         loginPage = new LoginPage();
-        scene = new Scene(loginPage.getMainLayout(), 900, 700);
+        scene = new Scene(loginPage.getMainLayout(), 1000, 800);
         LoginPageStylization loginPageStylization = new LoginPageStylization(loginPage);
     }
 

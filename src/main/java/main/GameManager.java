@@ -1,7 +1,7 @@
 package main;
 
-import com.controller.game.BlackJackController;
-import com.controller.game.RouletteController;
+import com.controller.game.table_game.BlackJackController;
+import com.controller.game.table_game.RouletteController;
 import com.controller.pages.LoginPageController;
 import com.controller.pages.MenuPageController;
 import com.controller.pages.RegistrationPageController;

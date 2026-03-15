@@ -29,7 +29,7 @@ public class MenuPageController extends Controller {
     protected void initializeScene() {
         menuPage = new MenuPage();
         MenuPageStylization menuPageStylization = new MenuPageStylization(menuPage);
-        scene = new Scene(menuPage.getMainLayout(), 1200, 800);
+        scene = new Scene(menuPage.getMainLayout(), 1000, 800);
     }
 
     @Override

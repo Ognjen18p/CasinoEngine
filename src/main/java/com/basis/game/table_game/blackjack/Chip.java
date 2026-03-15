@@ -1,4 +1,4 @@
-package com.basis.game.BlackJack;
+package com.basis.game.table_game.blackjack;
 
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -9,6 +9,7 @@ public class Chip {
 
     private final int value;
     private boolean isSelected;
+    private boolean isDragged;
     private Button button;
     private ImageView image;
 
@@ -30,6 +31,14 @@ public class Chip {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public boolean isDragged() {
+        return isDragged;
+    }
+
+    public void setDragged(boolean dragged) {
+        isDragged = dragged;
     }
 
     public Chip(int value, double xPos, double yPos, boolean isButton) {

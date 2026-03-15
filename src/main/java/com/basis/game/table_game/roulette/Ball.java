@@ -1,41 +1,58 @@
-package com.basis.game.Roulette;
+package com.basis.game.table_game.roulette;
 
+import com.basis.game.essentials.Vector2;
 import javafx.animation.AnimationTimer;
-import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.util.Map;
-
 public class Ball {
-    private final Roulette roulette;
-    private final ImageView image;
-    private Vector2 velocity;
-    private Vector2 position;
-    private Vector2 center;
     private final double friction;
     private final double gravity;
     private final double startRadius;
     private final double targetRadius;
+    private final Roulette roulette;
+    private final ImageView image;
+    private final Vector2 size;
+    private Vector2 velocity;
+    private Vector2 position;
+    private Vector2 center;
+    private Runnable onStopped;
 
-    public Ball(Roulette roulette) {
+    public void setOnStopped(Runnable onStopped) {
+        this.onStopped = onStopped;
+    }
+
+    public ImageView getImage() {
+        return image;
+    }
+
+    public Vector2 getSize() {
+        return size;
+    }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public Ball(Roulette roulette, Vector2 size) {
         this.roulette = roulette;
+        this.size = size;
         friction = 0.99;
         gravity = 9.8;
-        startRadius = 170;
-        targetRadius = 120;
+        startRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX();
+        targetRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX() * 4;
 
         image = new ImageView(new Image(getClass().getResource("/images/RouletteImages/ball.png").toExternalForm()));
-        image.setFitWidth(12);
-        image.setFitHeight(12);
+        image.setFitWidth(size.getX());
+        image.setFitHeight(size.getY());
 
-        roulette.getBallTrack().getChildren().add(image);
+        roulette.getWheel().getBallTrack().getChildren().add(image);
     }
 
     public void startBallMovement() {
-
         double randomStartAngle = Math.toRadians(Math.random() * 360);
-        center = new Vector2(roulette.getTable().getLayoutX() + roulette.getTable().getWidth() / 2, roulette.getTable().getLayoutY() + roulette.getTable().getHeight() / 2);
+        center = new Vector2(roulette.getWheel().getWheelSize().getX() / 2,
+                                roulette.getWheel().getWheelSize().getY() / 2);
         position = new Vector2(center.getX() + Math.cos(randomStartAngle) * startRadius, center.getY() + Math.sin(randomStartAngle) * startRadius);
         velocity = new Vector2(-Math.sin(randomStartAngle) * 1000, Math.cos(randomStartAngle) * 1000);
         AnimationTimer ballTimer = new AnimationTimer() {
@@ -68,45 +85,15 @@ public class Ball {
                 image.setX(position.getX() - image.getFitWidth() / 2);
                 image.setY(position.getY() - image.getFitHeight() / 2);
 
-                roulette.getTable().setRotate(roulette.getTable().getRotate() + speed * deltaTime);
+                roulette.getWheel().getTable().setRotate(roulette.getWheel().getTable().getRotate() + speed * deltaTime);
 
                 if (radius <= targetRadius) {
                     stop();
-                    snapBallToPocket();
+                    onStopped.run();
                 }
             }
         };
         ballTimer.start();
     }
 
-    public void snapBallToPocket() {
-
-        int closestPocket = 0;
-        double closest = 99999;
-        for (Map.Entry<Integer, ImageView> entry : roulette.getPockets().entrySet()) {
-            Bounds bounds = entry.getValue().localToScene(entry.getValue().getBoundsInLocal());
-            double pocketX = bounds.getCenterX();
-            double pocketY = bounds.getCenterY();
-
-            Bounds ballBounds = image.localToScene(image.getBoundsInLocal());
-            double ballX = ballBounds.getCenterX();
-            double ballY = ballBounds.getCenterY();
-            double x = ballX - pocketX;
-            double y = ballY - pocketY;
-            double magnitude = Math.sqrt(x * x + y * y);
-
-            if (magnitude < closest) {
-                closestPocket = entry.getKey();
-                closest = magnitude;
-                System.out.println(ballX + " ball pos " + ballY);
-                System.out.println(pocketX + " pocekt pos " + pocketY);
-
-            }
-        }
-
-        image.setX(roulette.getPockets().get(closestPocket).getX());
-        image.setY(roulette.getPockets().get(closestPocket).getY());
-
-        System.out.println("Rezultat: " + closestPocket);
-    }
 }
