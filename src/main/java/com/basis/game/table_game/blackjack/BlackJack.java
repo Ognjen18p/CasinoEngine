@@ -47,7 +47,8 @@ public class BlackJack extends TableGame {
     private ArrayList<Card> playerCards;
     private ArrayList<Card> dealerCards;
 
-    public BlackJack() {
+    public BlackJack(Vector2 windowSize) {
+        this.windowSize = windowSize;
         initializeElements();
     }
 
@@ -242,6 +243,9 @@ public class BlackJack extends TableGame {
                 deal, hit, stand, bettingChips.getFirst().getImage());
 
         blackJackPhaseState = BlackJackPhaseState.DEAL;
+
+        fillCardSlots();
+        addCards();
     }
 
     public void fillCardSlots() {

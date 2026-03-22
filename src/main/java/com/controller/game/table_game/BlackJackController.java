@@ -1,5 +1,6 @@
 package com.controller.game.table_game;
 
+import com.basis.game.essentials.Vector2;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.BlackJack;
 import com.basis.game.table_game.blackjack.Card;
@@ -19,12 +20,11 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackJackController extends TableGameController {
-    private final BlackJack blackJack;
+    private BlackJack blackJack;
     private ChipShop chipShop;
 
     public BlackJackController(GameManager gameManager) {
         this.gameManager = gameManager;
-        blackJack = new BlackJack();
         initializeScene();
         setupEventHandlers();
     }
@@ -46,12 +46,11 @@ public class BlackJackController extends TableGameController {
 
     @Override
     protected void initializeScene() {
+        blackJack = new BlackJack(new Vector2(1000, 800));
+
         chipShop = new ChipShop(blackJack);
 
-        blackJack.getDeck().fill();
-        blackJack.addCards();
-
-        scene = new Scene(blackJack.getMainPane(), 1000, 800);
+        scene = new Scene(blackJack.getMainPane(), blackJack.getWindowSize().getX(), blackJack.getWindowSize().getY());
 
         BlackJackStylization blackJackStylization = new BlackJackStylization(blackJack);
     }

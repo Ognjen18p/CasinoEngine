@@ -146,8 +146,8 @@ public class MenuPageStylization {
 
         Image blackjackImage = new Image(getClass().getResource("/images/MenuGamesImages/blackjack.png").toExternalForm());
         ImageView blackjackIcon = new ImageView(blackjackImage);
-        blackjackIcon.setFitWidth(200);
-        blackjackIcon.setFitHeight(250);
+        blackjackIcon.setFitWidth(50);
+        blackjackIcon.setFitHeight(70);
         menuPage.getBlackjackImageButton().setGraphic(blackjackIcon);
         menuPage.getBlackjackImageButton().setStyle(imageButtonStyle);
         menuPage.getBlackjackImageButton().setOnMouseEntered(e ->
@@ -158,8 +158,8 @@ public class MenuPageStylization {
 
         Image rouletteImage = new Image(getClass().getResource("/images/MenuGamesImages/roulette.png").toExternalForm());
         ImageView rouletteIcon = new ImageView(rouletteImage);
-        rouletteIcon.setFitWidth(200);
-        rouletteIcon.setFitHeight(250);
+        rouletteIcon.setFitWidth(50);
+        rouletteIcon.setFitHeight(70);
         menuPage.getRouletteImageButton().setGraphic(rouletteIcon);
         menuPage.getRouletteImageButton().setStyle(imageButtonStyle);
         menuPage.getRouletteImageButton().setOnMouseEntered(e ->
@@ -170,8 +170,8 @@ public class MenuPageStylization {
 
         Image slotImage = new Image(getClass().getResource("/images/MenuGamesImages/slot.png").toExternalForm());
         ImageView slotIcon = new ImageView(slotImage);
-        slotIcon.setFitHeight(250);
-        slotIcon.setFitWidth(200);
+        slotIcon.setFitHeight(50);
+        slotIcon.setFitWidth(70);
         menuPage.getSlotImageButton().setGraphic(slotIcon);
         menuPage.getSlotImageButton().setStyle(imageButtonStyle);
         menuPage.getSlotImageButton().setOnMouseEntered(e ->

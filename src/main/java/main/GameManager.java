@@ -1,5 +1,6 @@
 package main;
 
+import com.controller.game.machine_game.SlotController;
 import com.controller.game.table_game.BlackJackController;
 import com.controller.game.table_game.RouletteController;
 import com.controller.pages.LoginPageController;
@@ -14,6 +15,7 @@ public class GameManager {
     private final MenuPageController menuPageController;
     private final BlackJackController blackJackController;
     private final RouletteController rouletteController;
+    private final SlotController slotController;
     private final Stage mainStage;
 
     public GameManager(){
@@ -22,6 +24,7 @@ public class GameManager {
         menuPageController = new MenuPageController(this);
         blackJackController = new BlackJackController(this);
         rouletteController = new RouletteController(this);
+        slotController = new SlotController(this);
         mainStage = new Stage();
         initializeGameManager();
     }
@@ -44,6 +47,10 @@ public class GameManager {
 
     public RouletteController getRouletteController() {
         return rouletteController;
+    }
+
+    public SlotController getSlotController() {
+        return slotController;
     }
 
     public Stage getMainStage() {

@@ -39,7 +39,8 @@ public class Roulette extends TableGame {
         return chipShopButton;
     }
 
-    public Roulette() {
+    public Roulette(Vector2 windowSize) {
+        this.windowSize = windowSize;
         initializeElements();
     }
 

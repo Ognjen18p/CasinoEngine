@@ -8,6 +8,11 @@ public class Vector2 {
         y = 0.0;
     }
 
+    public Vector2(double xy) {
+        this.x = xy;
+        this.y = xy;
+    }
+
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;

@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class RouletteController extends TableGameController {
-    private final Roulette roulette;
+    private Roulette roulette;
     private Ball ball;
     private ChipShop chipShop;
 
     public RouletteController(GameManager gameManager) {
         this.gameManager = gameManager;
-        roulette = new Roulette();
         initializeScene();
         chipShop = new ChipShop(roulette);
         setupEventHandlers();
@@ -41,11 +40,13 @@ public class RouletteController extends TableGameController {
 
     @Override
     protected void initializeScene() {
+        roulette = new Roulette(new Vector2(1000, 800));
+
         ball = new Ball(roulette, new Vector2(22, 22));
 
         chipShop = new ChipShop(roulette);
 
-        scene = new Scene(roulette.getMainPane(), 1000, 800);
+        scene = new Scene(roulette.getMainPane(), roulette.getWindowSize().getX(), roulette.getWindowSize().getY());
         RouletteStylization stylization = new RouletteStylization(roulette);
 
     }
@@ -63,7 +64,7 @@ public class RouletteController extends TableGameController {
             roulette.getWheel().getTable().setVisible(true);
             roulette.getWheel().getTable().toFront();
             roulette.getSpinButton().setVisible(false);
-            ball.startBallMovement();
+            ball.startBallSpinning();
         });
     }
 

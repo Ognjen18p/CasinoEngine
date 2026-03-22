@@ -106,7 +106,7 @@ public class MenuPageController extends Controller {
     }
 
     private void handleSlotsSelection() {
-        menuPage.showErrorMessage("Slots coming soon!");
+        gameManager.getSlotController().showScene();
     }
 
     private void updatePlayerInfo() {

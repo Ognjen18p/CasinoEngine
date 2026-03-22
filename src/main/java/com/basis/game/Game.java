@@ -1,11 +1,13 @@
 package com.basis.game;
 
+import com.basis.game.essentials.Vector2;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
 public abstract class Game {
     protected Pane mainPane;
+    protected Vector2 windowSize;
     protected Button depositButton;
     protected Button exitButton;
     protected Label winLabel;
@@ -33,6 +35,7 @@ public abstract class Game {
         win = 0;
 
         mainPane = new Pane();
+        mainPane.setPrefSize(windowSize.getX(), windowSize.getY());
         depositButton = new Button("Deposit");
         exitButton = new Button("Exit");
         totalWinLabel = new Label(Integer.toString(totalWin));
@@ -161,6 +164,10 @@ public abstract class Game {
 
     public void setMainPane(Pane mainPane) {
         this.mainPane = mainPane;
+    }
+
+    public Vector2 getWindowSize() {
+        return windowSize;
     }
 
     public boolean isPlaying() {

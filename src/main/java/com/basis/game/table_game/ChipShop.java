@@ -16,7 +16,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 
 public class ChipShop {
-    private final Game game;
+    private Game game;
     private final HBox mainPane;
     private ArrayList<Chip> availableChips;
     private final ObservableList<Chip> destinationChips;

@@ -38,7 +38,7 @@ public class Ball {
         this.roulette = roulette;
         this.size = size;
         friction = 0.99;
-        gravity = 9.8;
+        gravity = 9.81;
         startRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX();
         targetRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX() * 4;
 
@@ -49,7 +49,7 @@ public class Ball {
         roulette.getWheel().getBallTrack().getChildren().add(image);
     }
 
-    public void startBallMovement() {
+    public void startBallSpinning() {
         double randomStartAngle = Math.toRadians(Math.random() * 360);
         center = new Vector2(roulette.getWheel().getWheelSize().getX() / 2,
                                 roulette.getWheel().getWheelSize().getY() / 2);
@@ -75,7 +75,7 @@ public class Ball {
                 double speed = velocity.magnitude();
                 double centripetalForce = (speed * speed) / radius;
                 double orbitalBalance = Math.max(0, radius - targetRadius);
-                double totalForce = centripetalForce + orbitalBalance + radius * gravity * deltaTime;
+                double totalForce = centripetalForce + orbitalBalance + (radius * gravity * deltaTime);
                 Vector2 forceVector = Vector2.multiply(toCenterNormalized, totalForce * deltaTime);
 
                 velocity = Vector2.add(velocity, forceVector);
