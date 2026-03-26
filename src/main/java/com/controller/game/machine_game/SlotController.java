@@ -4,13 +4,13 @@ import com.basis.game.essentials.Vector2;
 import com.basis.game.machine_game.Reel;
 import com.basis.game.machine_game.Slot;
 import com.controller.Controller;
+import com.stylization.game.SlotStylization;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import main.GameManager;
 
 public class SlotController extends Controller {
     private Slot slot;
-    private AnimationTimer spinTimer;
 
     public SlotController(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -26,8 +26,21 @@ public class SlotController extends Controller {
 
     @Override
     protected void initializeScene() {
-        slot = new Slot(new Vector2(1000, 800), new Vector2(5, 4), 10, 1000);
+        slot = new Slot(new Vector2(1000, 800), new Vector2(5, 3), 10, 1000);
+
+        SlotStylization slotStylization = new SlotStylization(slot);
+
         scene = new Scene(slot.getMainPane(), slot.getWindowSize().getX(), slot.getWindowSize().getY());
+//        slot.setBet(1);
+//        int spins = 100_000;
+//        for (int i = 0; i < spins; i++) {
+//            for (Reel reel : slot.getReels())
+//                reel.replacement();
+//            slot.checkWin();
+//        }
+//        System.out.println(slot.totalbet + " bets " + slot.totalwin + " wins: " + (double) slot.totalwin / slot.totalbet * 100 + "% i " + slot.hits);
+//        slot.setBet(0);
+//        slot.setBalance(1000);
     }
 
     @Override
@@ -38,7 +51,7 @@ public class SlotController extends Controller {
 
     private void handleBetting() {
         slot.getAddBetButton().setOnAction(event -> {
-            slot.setBet(slot.getBet() + 10);
+            slot.setBet(Math.min(slot.getMaximumBet(), slot.getBet() + 10));
             slot.getSpinButton().setDisable(slot.getBet() < slot.getMinimumBet());
         });
         slot.getRemoveBetButton().setOnAction(event -> {
@@ -55,16 +68,17 @@ public class SlotController extends Controller {
                 slot.getSpinButton().setDisable(true);
                 spin();
             }
+
         });
     }
 
     private void spin() {
-        spinTimer = new AnimationTimer() {
+        AnimationTimer spinTimer = new AnimationTimer() {
             long previousTime = 0;
             long startTime = 0;
-            double velocity = 2000;
-            final double spinDuration = 3;
-            final double deceleration = velocity / spinDuration;
+            double velocity = 3500;
+            final double spinDuration = 1;
+            //            final double deceleration = velocity / spinDuration;
             boolean[] stoppedReels = new boolean[slot.getReels().size()];
 
             @Override
@@ -77,8 +91,7 @@ public class SlotController extends Controller {
                 double deltaTime = (currentTime - previousTime) / 1_000_000_000.0;
                 double elapsedTime = (currentTime - startTime) / 1_000_000_000.0;
                 previousTime = currentTime;
-                velocity -= deceleration * deltaTime;
-                velocity = Math.max(500, velocity);
+
                 for (int nReel = 0; nReel < slot.getReels().size(); nReel++) {
                     if (stoppedReels[nReel]) continue;
                     Reel reel = slot.getReels().get(nReel);

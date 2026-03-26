@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 
 public class Reel {
     private final int numberOfCells;
@@ -48,15 +49,25 @@ public class Reel {
         reelsCreation();
     }
 
+    private SymbolType getRandomSymbolType() {
+        Random rand = new Random();
+        int random = rand.nextInt(101);
+        int cumulation = 0;
+        for (SymbolType type : SymbolType.values()) {
+            cumulation += type.getProbability();
+            if(random <= cumulation) return type;
+        }
+        return SymbolType.SHURIKEN;
+    }
+
     private void reelsCreation() {
         for (int nPane = 0; nPane < 3; nPane++) {
             Pane symbolPane = new Pane();
             for (int nSymbol = 0; nSymbol < numberOfCells; nSymbol++) {
-                int random = (int) (Math.random() * numberOfCells);
-                Vector2 nPosition = new Vector2(position.getX(), position.getY() + nSymbol * width + offset);
-                Symbol symbol = new Symbol(SymbolType.values()[random], nPosition, new Vector2(width));
+                Vector2 nPosition = new Vector2(0, nSymbol * width + offset);
+                Symbol symbol = new Symbol(getRandomSymbolType(), nPosition, new Vector2(width));
                 symbolPane.getChildren().add(symbol.getSymbolImage());
-                if (nPane == 1) {
+                if (nPane == 2) {
                     winningSymbols.add(symbol);
                     winningPane = symbolPane;
                 }
@@ -83,10 +94,10 @@ public class Reel {
             double topBound = position.getY();
 
             if (positionY >= topBound && positionY <= topBound + (double) width / 3 && stopSpin && winningPane == symbolPane) {
-                System.out.println(positionY + " i " + topBound + " a " + bottomBound);
-                symbolPane.setLayoutY(topBound - offset);
-                for (Symbol symbol : winningSymbols) {
-                    System.out.println(symbol.getSymbolInfo().getId());
+                symbolPane.setLayoutY(topBound);
+                for(Pane otherPane : symbolPanes) {
+                    if(!otherPane.equals(symbolPane))
+                        otherPane.setVisible(false);
                 }
                 return true;
             }
