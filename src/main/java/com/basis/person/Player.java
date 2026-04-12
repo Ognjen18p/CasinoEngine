@@ -3,21 +3,24 @@ package com.basis.person;
 import java.util.Date;
 
 public class Player extends Person{
-    private float balance;
+    private double balance;
     private int successiveWins;
 //    private Card savedCard;
 
+
+    public Player() {
+    }
 
     public Player(float balance, int successiveWins) {
         this.balance = balance;
         this.successiveWins = successiveWins;
     }
 
-    public float getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -29,14 +32,11 @@ public class Player extends Person{
         this.successiveWins = successiveWins;
     }
 
-    public Player(int id, String name, String surname, String email, String username, String password, Role role, Date dateCreated, float balance, int successiveWins) {
-        super(id, name, surname, email, username, password, role, dateCreated);
+    public Player(int id, String firstName, String lastName, String email, String username, String password, Date dateCreated, float balance, int successiveWins) {
+        super(id, firstName, lastName, email, username, password, dateCreated);
+        this.role = Role.PLAYER;
         this.balance = 0;
         this.successiveWins = 0;
     }
 
-    @Override
-    public Role getRole() {
-        return Role.PLAYER;
-    }
 }

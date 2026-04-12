@@ -1,16 +1,14 @@
-package com.stylization.pages;
+package com.stylization.page;
 
-import com.basis.pages.LoginPage;
-import com.basis.pages.RegistrationPage;
+import com.basis.page.RegistrationPage;
 
 public class RegistrationPageStylization {
     private RegistrationPage registrationPage;
 
     public RegistrationPageStylization(RegistrationPage registrationPage) {
         this.registrationPage = registrationPage;
-        styleRegistrationPage();
     }
+
     public void styleRegistrationPage() {
-        registrationPage.getCreateAccountButton();
     }
 }

@@ -1,6 +1,6 @@
-package com.stylization.pages;
+package com.stylization.page;
 
-import com.basis.pages.MenuPage;
+import com.basis.page.in_game_pages.MenuPage;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -121,11 +121,6 @@ public class MenuPageStylization {
                         "-fx-padding: 10 0 10 0;"
         );
 
-        // Footer label
-        menuPage.getFooterLabel().setStyle(
-                "-fx-font-size: 11px;" +
-                        "-fx-text-fill: #888888;"
-        );
     }
 
     private void styleGameButtons() {
@@ -144,7 +139,7 @@ public class MenuPageStylization {
                 "-fx-background-color: linear-gradient(to bottom, #4CAF50, #45a049);" +
                         "-fx-border-color: #66BB6A;";
 
-        Image blackjackImage = new Image(getClass().getResource("/images/MenuGamesImages/blackjack.png").toExternalForm());
+        Image blackjackImage = new Image(getClass().getResource("/images/MenuImages/blackjack.png").toExternalForm());
         ImageView blackjackIcon = new ImageView(blackjackImage);
         blackjackIcon.setFitWidth(50);
         blackjackIcon.setFitHeight(70);
@@ -156,7 +151,7 @@ public class MenuPageStylization {
                 menuPage.getBlackjackImageButton().setStyle(imageButtonStyle));
 
 
-        Image rouletteImage = new Image(getClass().getResource("/images/MenuGamesImages/roulette.png").toExternalForm());
+        Image rouletteImage = new Image(getClass().getResource("/images/MenuImages/roulette.png").toExternalForm());
         ImageView rouletteIcon = new ImageView(rouletteImage);
         rouletteIcon.setFitWidth(50);
         rouletteIcon.setFitHeight(70);
@@ -168,7 +163,7 @@ public class MenuPageStylization {
                 menuPage.getRouletteImageButton().setStyle(imageButtonStyle));
 
 
-        Image slotImage = new Image(getClass().getResource("/images/MenuGamesImages/slot.png").toExternalForm());
+        Image slotImage = new Image(getClass().getResource("/images/MenuImages/slot.png").toExternalForm());
         ImageView slotIcon = new ImageView(slotImage);
         slotIcon.setFitHeight(50);
         slotIcon.setFitWidth(70);

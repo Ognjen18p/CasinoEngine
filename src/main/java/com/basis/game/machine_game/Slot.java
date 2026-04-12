@@ -1,6 +1,7 @@
 package com.basis.game.machine_game;
 
 import com.basis.game.Game;
+import com.basis.game.essentials.GameSettings;
 import com.basis.game.essentials.Vector2;
 import com.basis.game.machine_game.symbols.Symbol;
 import com.basis.game.machine_game.symbols.SymbolInfo;
@@ -49,8 +50,11 @@ public class Slot extends Game {
         return reels;
     }
 
-    public Slot(Vector2 windowSize, Vector2 slotGridSize, int minimumBet, int maximumBet) {
-        this.windowSize = windowSize;
+    public Vector2 getSlotGridSize() {
+        return slotGridSize;
+    }
+
+    public Slot( Vector2 slotGridSize, int minimumBet, int maximumBet) {
         this.slotGridSize = slotGridSize;
         this.minimumBet = minimumBet;
         this.maximumBet = maximumBet;
@@ -100,8 +104,8 @@ public class Slot extends Game {
         exitButton.setTranslateY(100);
 
         border = new ImageView(new Image(getClass().getResource("/images/SlotImages/border_ninja.png").toExternalForm()));
-        border.setFitWidth(windowSize.getX());
-        border.setFitHeight(windowSize.getY());
+        border.setFitWidth(GameSettings.getInstance().getWindowWidth());
+        border.setFitHeight(GameSettings.getInstance().getWindowHeight());
 
         makeReels();
 
@@ -120,34 +124,6 @@ public class Slot extends Game {
             reels.add(reel);
             mainPane.getChildren().add(reel.getPane());
         }
-    }
-
-//    public int totalbet = 0;
-//    public int totalwin = 0;
-//    public int hits = 0;
-
-    public void checkWin() {
-        int numberOfRows = (int) slotGridSize.getY();
-        int winAmount = 0;
-
-        for (int nSymbol = 0; nSymbol < numberOfRows; nSymbol++) {
-            SymbolInfo startingReel = reels.getFirst().getWinningSymbols().get(nSymbol).getSymbolInfo();
-            int connectedCounter = 1;
-            for (int nReel = 1; nReel < reels.size(); nReel++) {
-                SymbolInfo currentSymbol = reels.get(nReel).getWinningSymbols().get(nSymbol).getSymbolInfo();
-                if (currentSymbol.getId().equals(startingReel.getId()))
-                    connectedCounter++;
-                else break;
-            }
-            if (connectedCounter >= 3)
-                winAmount += startingReel.getPayouts()[connectedCounter - 1];
-        }
-
-//        totalbet += bet;
-//        totalwin += winAmount;
-//        if (winAmount > 0) hits++;
-        if (winAmount >= 0)
-            setBalance(balance + winAmount * bet);
     }
 
 }

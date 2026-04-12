@@ -1,4 +1,4 @@
-package com.stylization.menus;
+package com.stylization.menu;
 
 public class ProfileStylization {
 }

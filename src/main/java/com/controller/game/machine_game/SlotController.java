@@ -1,19 +1,20 @@
 package com.controller.game.machine_game;
 
+import com.basis.game.essentials.GameSettings;
 import com.basis.game.essentials.Vector2;
 import com.basis.game.machine_game.Reel;
 import com.basis.game.machine_game.Slot;
+import com.basis.game.machine_game.symbols.SymbolInfo;
 import com.controller.Controller;
 import com.stylization.game.SlotStylization;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
-import main.GameManager;
+import com.manager.GameManager;
 
 public class SlotController extends Controller {
     private Slot slot;
 
-    public SlotController(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public SlotController() {
         initializeScene();
         setupEventHandlers();
     }
@@ -26,11 +27,11 @@ public class SlotController extends Controller {
 
     @Override
     protected void initializeScene() {
-        slot = new Slot(new Vector2(1000, 800), new Vector2(5, 3), 10, 1000);
+        slot = new Slot(new Vector2(5, 3), 10, 1000);
 
         SlotStylization slotStylization = new SlotStylization(slot);
 
-        scene = new Scene(slot.getMainPane(), slot.getWindowSize().getX(), slot.getWindowSize().getY());
+        scene = new Scene(slot.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
 //        slot.setBet(1);
 //        int spins = 100_000;
 //        for (int i = 0; i < spins; i++) {
@@ -45,8 +46,8 @@ public class SlotController extends Controller {
 
     @Override
     public void showScene() {
-        gameManager.setMainScene(scene);
-        gameManager.getMainStage().setTitle("SLOT");
+        GameManager.getInstance().setMainScene(scene);
+        GameManager.getInstance().getMainStage().setTitle("SLOT");
     }
 
     private void handleBetting() {
@@ -103,7 +104,7 @@ public class SlotController extends Controller {
                 for (boolean stopped : stoppedReels)
                     allStopped = allStopped && stopped;
                 if (allStopped) {
-                    slot.checkWin();
+                    checkWinner();
                     slot.getSpinButton().setDisable(slot.getBalance() < slot.getMinimumBet());
                     stop();
                 }
@@ -111,5 +112,35 @@ public class SlotController extends Controller {
         };
         spinTimer.start();
     }
+
+
+//    public int totalbet = 0;
+//    public int totalwin = 0;
+//    public int hits = 0;
+
+    public void checkWinner() {
+        int numberOfRows = (int) slot.getSlotGridSize().getY();
+        int winAmount = 0;
+
+        for (int nSymbol = 0; nSymbol < numberOfRows; nSymbol++) {
+            SymbolInfo startingReel = slot.getReels().getFirst().getWinningSymbols().get(nSymbol).getSymbolInfo();
+            int connectedCounter = 1;
+            for (int nReel = 1; nReel < slot.getReels().size(); nReel++) {
+                SymbolInfo currentSymbol = slot.getReels().get(nReel).getWinningSymbols().get(nSymbol).getSymbolInfo();
+                if (currentSymbol.getId().equals(startingReel.getId()))
+                    connectedCounter++;
+                else break;
+            }
+            if (connectedCounter >= 3)
+                winAmount += startingReel.getPayouts()[connectedCounter - 1];
+        }
+
+//        totalbet += bet;
+//        totalwin += winAmount;
+//        if (winAmount > 0) hits++;
+        if (winAmount >= 0)
+            slot.setBalance(slot.getBalance() + winAmount * slot.getBet());
+    }
+
 }
 

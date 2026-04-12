@@ -1,4 +1,4 @@
-package com.basis.pages;
+package com.basis.page;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -7,13 +7,35 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-public class RegistrationPage extends LoginPage {
-    private TextField nameField;
-    private TextField surnameField;
+public class RegistrationPage extends Page {
+    private TextField usernameField;
+    private TextField firstNameField;
+    private TextField lastNameField;
     private TextField emailField;
+    private PasswordField passwordField;
     private PasswordField confirmPasswordField;
     private Button createNewAccountButton;
     private Button alreadyHaveAccountButton;
+
+    public RegistrationPage() {
+        super();
+    }
+
+    public TextField getUsernameField() {
+        return usernameField;
+    }
+
+    public TextField getFirstNameField() {
+        return firstNameField;
+    }
+
+    public TextField getLastNameField() {
+        return lastNameField;
+    }
+
+    public PasswordField getPasswordField() {
+        return passwordField;
+    }
 
     public TextField getEmailField() {
         return emailField;
@@ -32,11 +54,11 @@ public class RegistrationPage extends LoginPage {
     }
 
     public TextField getNameField() {
-        return nameField;
+        return firstNameField;
     }
 
     public TextField getSurnameField() {
-        return surnameField;
+        return firstNameField;
     }
 
     @Override
@@ -45,11 +67,11 @@ public class RegistrationPage extends LoginPage {
         errorMessageLabel = new Label("");
         footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");
 
-        nameField = new TextField();
-        nameField.setPromptText("Name");
+        firstNameField = new TextField();
+        firstNameField.setPromptText("Name");
 
-        surnameField = new TextField();
-        surnameField.setPromptText("Surname");
+        lastNameField = new TextField();
+        lastNameField.setPromptText("Surname");
 
         usernameField = new TextField();
         usernameField.setPromptText("Username");
@@ -75,8 +97,8 @@ public class RegistrationPage extends LoginPage {
 
         mainLayout.getChildren().addAll(
                 titleLabel,
-                nameField,
-                surnameField,
+                firstNameField,
+                lastNameField,
                 usernameField,
                 emailField,
                 passwordField,
@@ -87,7 +109,4 @@ public class RegistrationPage extends LoginPage {
         );
     }
 
-    public RegistrationPage() {
-        initializeElements();
-    }
 }

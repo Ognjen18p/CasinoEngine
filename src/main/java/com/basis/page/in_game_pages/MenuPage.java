@@ -1,18 +1,16 @@
-package com.basis.pages;
+package com.basis.page.in_game_pages;
 
+import com.basis.page.Page;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class MenuPage extends Page {
+public class MenuPage extends InGamePage {
     private Label balanceLabel;
     private Button logoutButton;
     private Button depositButton;
@@ -29,6 +27,10 @@ public class MenuPage extends Page {
     private BorderPane borderPane;
     private VBox leftPanel;
     private VBox centerPanel;
+
+    public MenuPage() {
+        super();
+    }
 
     public Label getBalanceLabel() {
         return balanceLabel;
@@ -78,7 +80,7 @@ public class MenuPage extends Page {
         return borderPane;
     }
 
-    public void updateBalance(float balance) {
+    public void updateBalance(double balance) {
         balanceLabel.setText(String.format("Balance: $%.2f", balance));
     }
 
@@ -140,8 +142,5 @@ public class MenuPage extends Page {
         mainLayout.getChildren().add(borderPane);
     }
 
-    public MenuPage() {
-        initializeElements();
-    }
 
 }

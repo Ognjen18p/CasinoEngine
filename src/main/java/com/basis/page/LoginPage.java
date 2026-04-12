@@ -1,19 +1,21 @@
-package com.basis.pages;
+package com.basis.page;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
-public class LoginPage extends Page{
+public class LoginPage extends Page {
     protected TextField usernameField;
     protected PasswordField passwordField;
     protected Button loginButton;
     protected Button createAccountButton;
+
+    public LoginPage() {
+        super();
+    }
 
     public TextField getUsernameField() {
         return usernameField;
@@ -37,7 +39,9 @@ public class LoginPage extends Page{
         errorMessageLabel.setText("");
     }
 
-    protected void initializeElements() {
+
+    @Override
+    public void initializeElements() {
         titleLabel = new Label("CasinoEngine");
         errorMessageLabel = new Label("");
         footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");
@@ -68,7 +72,4 @@ public class LoginPage extends Page{
         );
     }
 
-    public LoginPage() {
-        initializeElements();
-    }
 }

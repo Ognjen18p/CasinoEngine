@@ -1,8 +1,6 @@
-package com.stylization.pages;
+package com.stylization.page;
 
-import com.basis.pages.LoginPage;
-import javafx.geometry.Pos;
-import javafx.scene.layout.VBox;
+import com.basis.page.LoginPage;
 
 public class LoginPageStylization {
     private LoginPage loginPage;

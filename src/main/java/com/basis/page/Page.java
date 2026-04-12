@@ -1,5 +1,8 @@
-package com.basis.pages;
+package com.basis.page;
 
+import com.basis.game.essentials.GameSettings;
+import com.basis.game.essentials.Vector2;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -10,12 +13,14 @@ public abstract class Page {
     protected VBox mainLayout;
     protected VBox buttonBox;
 
-    public Label getErrorMessageLabel() {
-        return errorMessageLabel;
+    protected abstract void initializeElements();
+
+    public Page() {
+        initializeElements();
     }
 
-    public Label getFooterLabel() {
-        return footerLabel;
+    public Label getErrorMessageLabel() {
+        return errorMessageLabel;
     }
 
     public Label getTitleLabel() {

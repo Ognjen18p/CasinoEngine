@@ -1,5 +1,6 @@
 package com.controller.game.table_game;
 
+import com.basis.game.essentials.GameSettings;
 import com.basis.game.essentials.Vector2;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.BlackJack;
@@ -14,19 +15,15 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
-import main.GameManager;
+import com.manager.GameManager;
 
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackJackController extends TableGameController {
     private BlackJack blackJack;
     private ChipShop chipShop;
 
-    public BlackJackController(GameManager gameManager) {
-        this.gameManager = gameManager;
-        initializeScene();
-        setupEventHandlers();
+    public BlackJackController() {
     }
 
     @Override
@@ -40,17 +37,17 @@ public class BlackJackController extends TableGameController {
 
     @Override
     public void showScene() {
-        gameManager.setMainScene(scene);
-        gameManager.getMainStage().setTitle("BLACKJACK");
+        GameManager.getInstance().setMainScene(scene);
+        GameManager.getInstance().getMainStage().setTitle("BLACKJACK");
     }
 
     @Override
     protected void initializeScene() {
-        blackJack = new BlackJack(new Vector2(1000, 800));
+        blackJack = new BlackJack();
 
         chipShop = new ChipShop(blackJack);
 
-        scene = new Scene(blackJack.getMainPane(), blackJack.getWindowSize().getX(), blackJack.getWindowSize().getY());
+        scene = new Scene(blackJack.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
 
         BlackJackStylization blackJackStylization = new BlackJackStylization(blackJack);
     }
@@ -118,14 +115,14 @@ public class BlackJackController extends TableGameController {
 
     private void handleHit() {
         blackJack.getHitButton().setOnAction(actionEvent -> {
-            buttonsHitStandActive(false);
+            blackJack.buttonsHitStandActivation(false);
             hit();
         });
     }
 
     private void handleStand() {
         blackJack.getStandButton().setOnAction(actionEvent -> {
-            buttonsHitStandActive(false);
+            blackJack.buttonsHitStandActivation(false);
             stand();
         });
     }
@@ -146,13 +143,13 @@ public class BlackJackController extends TableGameController {
             card.getImage().setImage(blackJack.getDealersFlippedCard().getImage().getImage());
             blackJack.getDealersFlippedCard().getImage().setImage(savedImage);
             blackJack.getDealerCards().add(card);
-            addScoreDealer(card);
+            blackJack.addScoreDealer(card);
         } else if (puller == Puller.PLAYER) {
             blackJack.getPlayerCards().add(card);
-            addScorePlayer(card);
+            blackJack.addScorePlayer(card);
         } else {
             blackJack.getDealerCards().add(card);
-            addScoreDealer(card);
+            blackJack.addScoreDealer(card);
         }
 
         TranslateTransition moveCard = new TranslateTransition(Duration.millis(1200), card.getImage());
@@ -168,25 +165,13 @@ public class BlackJackController extends TableGameController {
         return new ParallelTransition(moveCard, rotateCard);
     }
 
-    private int getAndIncrementPlayerSlot() {
-        int currentFreeSlot = blackJack.getPlayerFreeSlot();
-        blackJack.setPlayerFreeSlot(currentFreeSlot + 1);
-        return currentFreeSlot;
-    }
-
-    private int getAndIncrementDealerSlot() {
-        int currentFreeSlot = blackJack.getDealerFreeSlot();
-        blackJack.setDealerFreeSlot(currentFreeSlot + 1);
-        return currentFreeSlot;
-    }
-
     private void deal() {
         SequentialTransition sequentialTransition = new SequentialTransition();
         sequentialTransition.getChildren().addAll(
-                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(getAndIncrementPlayerSlot())),
-                pullCard(true, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(getAndIncrementDealerSlot())),
-                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(getAndIncrementPlayerSlot())),
-                pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(getAndIncrementDealerSlot())));
+                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot())),
+                pullCard(true, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get( blackJack.getAndIncrementDealerSlot())),
+                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot())),
+                pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(blackJack.getAndIncrementDealerSlot())));
         sequentialTransition.setOnFinished(event -> {
             if (blackJack.getPlayerScore() == blackJack.getBLACKJACK()) {
                 blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_BLACKJACK);
@@ -194,74 +179,33 @@ public class BlackJackController extends TableGameController {
                 revealFlipped.setOnFinished(actionEvent -> {
                     if (blackJack.getDealerScore() == blackJack.getBLACKJACK())
                         blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
-                    checkWinState();
+                    checkWinner();
                 });
                 revealFlipped.play();
             } else if (blackJack.getDealerScore() == blackJack.getBLACKJACK()) {
                 blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_BLACKJACK);
                 Transition revealFlipped = revealFlipped();
-                revealFlipped.setOnFinished(actionEvent -> checkWinState());
+                revealFlipped.setOnFinished(actionEvent -> checkWinner());
                 revealFlipped.play();
             } else
-                buttonsHitStandActive(true);
+                blackJack.buttonsHitStandActivation(true);
         });
         sequentialTransition.play();
     }
 
-    private void addScorePlayer(Card card) {
-        if (card.getRank() != null) {
-            int currentScore = blackJack.getPlayerScore() + card.getRank().getValue();
-            if (currentScore > blackJack.getBLACKJACK()) {
-                for (Card nCard : blackJack.getPlayerSlots()) {
-                    if (nCard.getRank() == Card.Rank.ACE) {
-                        blackJack.setPlayerScore(blackJack.getPlayerScore() + card.getRank().getValue() - 10);
-                        nCard.setRank(Card.Rank.ONE);
-                        return;
-                    }
-                }
-                blackJack.setPlayerScore(currentScore);
-            } else
-                blackJack.setPlayerScore(currentScore);
-        }
-    }
-
-    private void addScoreDealer(Card card) {
-        if (card.getRank() != null) {
-            int currentScore = blackJack.getDealerScore() + card.getRank().getValue();
-            if (currentScore > blackJack.getBLACKJACK()) {
-                for (Card nCard : blackJack.getDealerSlots()) {
-                    if (nCard.getRank() == Card.Rank.ACE) {
-                        blackJack.setPlayerScore(blackJack.getDealerScore() + card.getRank().getValue() - 10);
-                        nCard.setRank(Card.Rank.ONE);
-                        return;
-                    }
-                }
-                blackJack.setDealerScore(currentScore);
-            } else
-                blackJack.setDealerScore(currentScore);
-        }
-    }
-
-    private void buttonsHitStandActive(boolean active) {
-        blackJack.getHitButton().setDisable(!active);
-        blackJack.getHitButton().setVisible(active);
-        blackJack.getStandButton().setDisable(!active);
-        blackJack.getStandButton().setVisible(active);
-    }
-
     private void hit() {
         if (blackJack.getPlayerScore() < blackJack.getBLACKJACK()) {
-            Transition pullCard = pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(getAndIncrementPlayerSlot()));
+            Transition pullCard = pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot()));
             pullCard.setOnFinished(event -> {
                 if (blackJack.getPlayerScore() > blackJack.getBLACKJACK()) {
                     Transition revealFlipped = revealFlipped();
                     revealFlipped.setOnFinished(actionEvent -> {
                         blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
-                        checkWinState();
+                        checkWinner();
                     });
                     revealFlipped.play();
                 }
-                buttonsHitStandActive(true);
+                blackJack.buttonsHitStandActivation(true);
             });
             pullCard.play();
         }
@@ -298,20 +242,20 @@ public class BlackJackController extends TableGameController {
 
     private void dealerPullCard() {
         if (blackJack.getDealerScore() <= 16) {
-            Transition pullCard = pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(getAndIncrementDealerSlot()));
+            Transition pullCard = pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(blackJack.getAndIncrementDealerSlot()));
             pullCard.setOnFinished(event -> {
                 dealerPullCard();
             });
             pullCard.play();
         } else if (blackJack.getDealerScore() == blackJack.getPlayerScore()) {
             blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
-            checkWinState();
+            checkWinner();
         } else if (blackJack.getDealerScore() < blackJack.getPlayerScore() || blackJack.getDealerScore() > blackJack.getBLACKJACK()) {
             blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_WINS);
-            checkWinState();
+            checkWinner();
         } else {
             blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
-            checkWinState();
+            checkWinner();
         }
     }
 
@@ -321,9 +265,9 @@ public class BlackJackController extends TableGameController {
         revealFlipped.play();
     }
 
-    private void checkWinState() {
+    private void checkWinner() {
         if (blackJack.getBlackJackWinState() != BlackJack.BlackJackWinState.IN_PROGRESS) {
-            buttonsHitStandActive(false);
+            blackJack.buttonsHitStandActivation(false);
             PauseTransition pauseTransition = new PauseTransition();
             pauseTransition.setDuration(Duration.millis(1100));
             pauseTransition.setOnFinished(event -> {
@@ -463,30 +407,9 @@ public class BlackJackController extends TableGameController {
             });
             blackJack.getPlayerCards().clear();
             blackJack.getDealerCards().clear();
-            reset();
+            blackJack.reset();
         });
         return parallelTransition;
     }
 
-    private void reset() {
-        blackJack.setDealerScore(0);
-        blackJack.setPlayerScore(0);
-
-        blackJack.setLastBet(blackJack.getBet());
-        blackJack.setBet(0);
-
-        blackJack.getDealersFlippedCard().getImage().setImage(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm()));
-
-        blackJack.setDealerFreeSlot(0);
-        blackJack.setPlayerFreeSlot(0);
-
-        blackJack.getDealButton().setVisible(false);
-        blackJack.getStandButton().setVisible(false);
-        blackJack.getHitButton().setVisible(false);
-
-        blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.IN_PROGRESS);
-
-        blackJack.getDeck().fill();
-        blackJack.addCards();
-    }
 }

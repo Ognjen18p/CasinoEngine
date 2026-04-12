@@ -1,21 +1,21 @@
-package com.controller.pages;
+package com.controller.page;
 
-import com.basis.pages.RegistrationPage;
-import com.basis.person.Person;
+import com.basis.game.essentials.GameSettings;
+import com.basis.page.RegistrationPage;
 import com.basis.person.Player;
 import com.basis.security.RegistrationValidator;
 import com.controller.Controller;
-import com.stylization.pages.RegistrationPageStylization;
+import com.manager.GameManager;
+import com.stylization.page.RegistrationPageStylization;
 import javafx.scene.Scene;
-import main.GameManager;
+
 import java.util.Date;
 
 public class RegistrationPageController extends Controller {
 
     private RegistrationPage registrationPage;
 
-    public RegistrationPageController(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public RegistrationPageController() {
         initializeScene();
         setupEventHandlers();
     }
@@ -23,8 +23,8 @@ public class RegistrationPageController extends Controller {
     @Override
     protected void initializeScene(){
         registrationPage = new RegistrationPage();
-        scene = new Scene(registrationPage.getMainLayout(), 1000, 800);
-        RegistrationPageStylization registrationPageStylization = new RegistrationPageStylization(registrationPage);
+        scene = new Scene(registrationPage.getMainLayout(), GameSettings.getInstance().getWindowWidth(),  GameSettings.getInstance().getWindowHeight());
+        new RegistrationPageStylization(registrationPage);
     }
 
     @Override
@@ -115,7 +115,6 @@ public class RegistrationPageController extends Controller {
                 email,
                 username,
                 password,
-                Person.Role.PLAYER,
                 new Date(),
                 0.0f,
                 0
@@ -128,12 +127,12 @@ public class RegistrationPageController extends Controller {
 
     @Override
     public void showScene() {
-        gameManager.setMainScene(scene);
-        gameManager.getMainStage().setTitle("Casino Engine - Register");
+        GameManager.getInstance().setMainScene(scene);
+        GameManager.getInstance().getMainStage().setTitle("Casino Engine - Register");
     }
 
     private void handleBackToLogin() {
-        gameManager.getLoginPageController().showScene();
+        GameManager.getInstance().setCurrentController(new LoginPageController());
     }
 
     private boolean usernameExists(String username) {

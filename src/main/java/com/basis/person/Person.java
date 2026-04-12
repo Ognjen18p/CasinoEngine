@@ -4,16 +4,16 @@ import java.util.Date;
 
 public abstract class Person {
     protected int id;
-    protected String name;
-    protected String surname;
+    protected String firstName;
+    protected String lastName;
     protected String email;
     protected String username;
-    private String password;
+    protected String password;
 
     protected Role role;
     protected Date dateCreated;
 
-    public enum Role{
+    public enum Role {
         PLAYER,
         AGENT
     }
@@ -21,14 +21,13 @@ public abstract class Person {
     public Person() {
     }
 
-    public Person(int id, String name, String surname, String email, String username, String password, Role role, Date dateCreated) {
+    public Person(int id, String firstName, String lastName, String email, String username, String password, Date dateCreated) {
         this.id = id;
-        this.name = name;
-        this.surname = surname;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.password = password;
-        this.role = role;
         this.dateCreated = dateCreated;
     }
 
@@ -48,7 +47,9 @@ public abstract class Person {
         this.password = password;
     }
 
-    public abstract Role getRole();
+    public Role getRole() {
+        return role;
+    }
 
     public Date getDateCreated() {
         return dateCreated;
@@ -61,6 +62,7 @@ public abstract class Person {
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -73,28 +75,32 @@ public abstract class Person {
         this.email = email;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override
     public String toString() {
         return "Person{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

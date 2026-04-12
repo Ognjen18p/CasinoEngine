@@ -1,5 +1,6 @@
 package com.controller.game.table_game;
 
+import com.basis.game.essentials.GameSettings;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.Chip;
 import com.basis.game.table_game.ChipShop;
@@ -15,7 +16,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
-import main.GameManager;
+import com.manager.GameManager;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -25,8 +26,7 @@ public class RouletteController extends TableGameController {
     private Ball ball;
     private ChipShop chipShop;
 
-    public RouletteController(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public RouletteController() {
         initializeScene();
         chipShop = new ChipShop(roulette);
         setupEventHandlers();
@@ -34,19 +34,19 @@ public class RouletteController extends TableGameController {
 
     @Override
     public void showScene() {
-        gameManager.setMainScene(scene);
-        gameManager.getMainStage().setTitle("Roulette");
+        GameManager.getInstance().setMainScene(scene);
+        GameManager.getInstance().getMainStage().setTitle("Roulette");
     }
 
     @Override
     protected void initializeScene() {
-        roulette = new Roulette(new Vector2(1000, 800));
+        roulette = new Roulette();
 
         ball = new Ball(roulette, new Vector2(22, 22));
 
         chipShop = new ChipShop(roulette);
 
-        scene = new Scene(roulette.getMainPane(), roulette.getWindowSize().getX(), roulette.getWindowSize().getY());
+        scene = new Scene(roulette.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
         RouletteStylization stylization = new RouletteStylization(roulette);
 
     }
@@ -70,7 +70,7 @@ public class RouletteController extends TableGameController {
 
     private void handleBallStopped(){
         ball.setOnStopped(() ->{
-            checkWinState(snapBallToPocket());
+            checkWinner(snapBallToPocket());
         });
     }
 
@@ -214,7 +214,7 @@ public class RouletteController extends TableGameController {
         return closestPocket;
     }
 
-    private void checkWinState(int number){
+    private void checkWinner(int number){
         boolean win = false;
         for(int value : roulette.getBettingField().getWinValues()){
             if (value == number) {
