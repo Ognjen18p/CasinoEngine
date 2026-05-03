@@ -1,7 +1,7 @@
 package com.basis.game;
 
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
+import com.application.GameManager;
+import com.application.configuration.GameSettings;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -17,7 +17,6 @@ public abstract class Game {
     protected Label betLabel;
     protected Label balanceLabel;
 
-    protected int balance;
     protected int bet;
     protected int lastBet;
     protected int win;
@@ -28,7 +27,6 @@ public abstract class Game {
 
     protected void initializeElements() {
         bet = 0;
-        balance = 1000;
         lastBet = lastBet;
         totalWin = totalWin;
         lastWin = lastWin;
@@ -46,7 +44,7 @@ public abstract class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "balance=" + balance +
+//                "balance=" + balance +
                 ", bet=" + bet +
                 ", lastBet=" + lastBet +
                 ", totalWin=" + totalWin +
@@ -101,13 +99,8 @@ public abstract class Game {
         return balanceLabel;
     }
 
-    public int getBalance() {
-        return balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-        balanceLabel.setText(Integer.toString(balance) + " BALANCE");
+    public void setBalance(double balance) {
+        balanceLabel.setText(GameManager.getInstance().getCurrentPlayer().getBalance() + " BALANCE");
     }
 
     public int getLastWin() {

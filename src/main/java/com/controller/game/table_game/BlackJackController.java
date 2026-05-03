@@ -1,13 +1,11 @@
 package com.controller.game.table_game;
 
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
+import com.application.configuration.GameSettings;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.BlackJack;
 import com.basis.game.table_game.blackjack.Card;
 import com.basis.game.table_game.blackjack.Chip;
 import com.basis.game.table_game.ChipShop;
-import com.controller.game.TableGameController;
 import com.stylization.game.BlackJackStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
@@ -15,7 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
-import com.manager.GameManager;
+import com.application.GameManager;
 
 import java.util.ArrayList;
 
@@ -24,6 +22,9 @@ public class BlackJackController extends TableGameController {
     private ChipShop chipShop;
 
     public BlackJackController() {
+        initializeScene();
+        setupEventHandlers();
+
     }
 
     @Override
@@ -325,7 +326,7 @@ public class BlackJackController extends TableGameController {
                 blackJack.getBettingChips().remove(aChip);
                 blackJack.getOwningChips().add(aChip);
             }
-            blackJack.setBalance(blackJack.getBalance() + blackJack.getBet());
+            GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + blackJack.getBet());
             blackJack.setWin(0);
         });
         return sequentialTransition;
@@ -358,7 +359,7 @@ public class BlackJackController extends TableGameController {
                 blackJack.setWin(addBalance);
                 blackJack.setLastWin(addBalance);
                 blackJack.setTotalWin(blackJack.getTotalWin() + addBalance);
-                blackJack.setBalance(blackJack.getBalance() + addBalance);
+                GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + addBalance);
 
                 aChip.setSelected(false);
                 blackJack.getBettingChips().remove(aChip);

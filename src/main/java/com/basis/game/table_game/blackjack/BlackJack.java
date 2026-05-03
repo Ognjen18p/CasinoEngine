@@ -1,7 +1,8 @@
 package com.basis.game.table_game.blackjack;
 
+import com.application.GameManager;
 import com.basis.game.table_game.TableGame;
-import com.basis.game.essentials.Vector2;
+import com.application.utilities.Vector2;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -208,7 +209,7 @@ public class BlackJack extends TableGame {
         betLabel.setTranslateX(100);
         betLabel.setTranslateY(350);
 
-        balanceLabel = new Label(balance + " BALANCE");
+        balanceLabel = new Label(GameManager.getInstance().getCurrentPlayer().getBalance() + " BALANCE");
         balanceLabel.setTranslateX(60);
         balanceLabel.setTranslateY(50);
 

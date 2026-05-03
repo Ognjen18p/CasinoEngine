@@ -1,17 +1,23 @@
 package com.basis.page;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.awt.*;
+
 public class LoginPage extends Page {
-    protected TextField usernameField;
-    protected PasswordField passwordField;
-    protected Button loginButton;
-    protected Button createAccountButton;
+    private Label usernameLabel;
+    private Label passwordLabel;
+    private TextField usernameField;
+    private PasswordField passwordField;
+    private Button loginButton;
+    private Button createAccountButton;
 
     public LoginPage() {
         super();
@@ -36,40 +42,59 @@ public class LoginPage extends Page {
     public void resetInputFields() {
         usernameField.clear();
         passwordField.clear();
-        errorMessageLabel.setText("");
     }
-
 
     @Override
     public void initializeElements() {
-        titleLabel = new Label("CasinoEngine");
-        errorMessageLabel = new Label("");
-        footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");
 
+        /// !!! Header !!!
+        titleLabel = new Label("CasinoEngine");
+        headerBox = new HBox(10);
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.getChildren().addAll(titleLabel);
+
+
+        /// !!! Content !!!
+        usernameLabel = new Label("Username:");
         usernameField = new TextField();
         usernameField.setPromptText("Username");
 
+        passwordLabel = new Label("Password:");
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
 
+        errorMessageLabel = new Label(" ");
+
         loginButton = new Button("Login");
+        loginButton.setMaxWidth(350);
         createAccountButton = new Button("Create Account");
+        createAccountButton.setMaxWidth(350);
 
-        mainLayout = new VBox(15);
-        buttonBox = new VBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPrefSize(200, 200);
-
-        buttonBox.getChildren().addAll(loginButton, createAccountButton);
-
-        mainLayout.getChildren().addAll(
-                titleLabel,
+        contentBox= new VBox(10);
+        contentBox.setAlignment(Pos.CENTER_LEFT);
+        contentBox.setMaxWidth(350);
+        contentBox.getChildren().addAll(
+                usernameLabel,
                 usernameField,
+                passwordLabel,
                 passwordField,
-                buttonBox,
                 errorMessageLabel,
-                footerLabel
-        );
+                loginButton,
+                createAccountButton);
+
+
+        /// !!! Footer !!!
+        footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");
+        footerBox = new HBox(10);
+        footerBox.setAlignment(Pos.CENTER);
+        footerBox.getChildren().addAll(footerLabel);
+
+        /// !!! Main root !!!
+        mainLayout = new BorderPane();
+        mainLayout.setTop(headerBox);
+        mainLayout.setCenter(contentBox);
+        mainLayout.setBottom(footerBox);
+
     }
 
 }

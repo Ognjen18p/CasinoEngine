@@ -1,6 +1,6 @@
 package com.basis.game.table_game.roulette;
 
-import com.basis.game.essentials.Vector2;
+import com.application.utilities.Vector2;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;

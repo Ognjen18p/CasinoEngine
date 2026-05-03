@@ -1,5 +1,6 @@
 package com.basis.game.table_game;
 
+import com.application.GameManager;
 import com.basis.game.Game;
 import com.basis.game.table_game.blackjack.Chip;
 import javafx.animation.KeyFrame;
@@ -89,10 +90,10 @@ public class ChipShop {
             plus.setStyle(shopButtonStyle());
 
             plus.setOnMouseClicked(event -> {
-                if (game.getBalance() > bettingValue) {
+                if (GameManager.getInstance().getCurrentPlayer().getBalance() > bettingValue) {
                     Chip newChip = new Chip(bettingValue, 0, 0, true);
                     game.getMainPane().getChildren().add(newChip.getButton());
-                    game.setBalance(game.getBalance() - bettingValue);
+                    game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() - bettingValue);
                     addChipTransition(newChip);
                 }
             });
@@ -101,7 +102,7 @@ public class ChipShop {
                 for (Chip chip : destinationChips) {
                     if (chip.getValue() == bettingValue && chip.getButton() != null) {
                         removeChipTransition(chip);
-                        game.setBalance(game.getBalance() + bettingValue);
+                        game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + bettingValue);
                         break;
                     }
                 }

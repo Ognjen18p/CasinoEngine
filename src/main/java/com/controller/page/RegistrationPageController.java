@@ -1,19 +1,27 @@
 package com.controller.page;
 
-import com.basis.game.essentials.GameSettings;
+import com.application.configuration.GameSettings;
+import com.basis.game.Game;
 import com.basis.page.RegistrationPage;
 import com.basis.person.Player;
-import com.basis.security.RegistrationValidator;
+import com.controller.security.InputValidator;
 import com.controller.Controller;
-import com.manager.GameManager;
+import com.application.GameManager;
+import com.controller.security.email_service.EmailService;
+import com.controller.security.email_service.VerificatonService;
+import com.database.page.RegisterPageDAO;
 import com.stylization.page.RegistrationPageStylization;
 import javafx.scene.Scene;
+import javafx.scene.control.DatePicker;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class RegistrationPageController extends Controller {
 
     private RegistrationPage registrationPage;
+    private RegisterPageDAO registerPageDAO;
+    private InputValidator inputValidator;
 
     public RegistrationPageController() {
         initializeScene();
@@ -21,9 +29,11 @@ public class RegistrationPageController extends Controller {
     }
 
     @Override
-    protected void initializeScene(){
+    protected void initializeScene() {
         registrationPage = new RegistrationPage();
-        scene = new Scene(registrationPage.getMainLayout(), GameSettings.getInstance().getWindowWidth(),  GameSettings.getInstance().getWindowHeight());
+        registerPageDAO = new RegisterPageDAO();
+        inputValidator = new InputValidator();
+        scene = new Scene(registrationPage.getMainLayout(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
         new RegistrationPageStylization(registrationPage);
     }
 
@@ -33,96 +43,94 @@ public class RegistrationPageController extends Controller {
 
         registrationPage.getAlreadyHaveAccountButton().setOnAction(event -> handleBackToLogin());
 
-        registrationPage.getConfirmPasswordField().setOnAction(event -> handleRegistration());
+        registrationPage.getChangeFieldsButton().setOnAction(event -> handleChangeData());
     }
 
     private void handleRegistration() {
         String name = registrationPage.getNameField().getText();
-        String surname = registrationPage.getSurnameField().getText().trim();
-        String email = registrationPage.getEmailField().getText().trim();
-        String username = registrationPage.getUsernameField().getText().trim();
+        String lastname = registrationPage.getLastnameField().getText();
+        String email = registrationPage.getEmailField().getText();
+        String username = registrationPage.getUsernameField().getText();
         String password = registrationPage.getPasswordField().getText();
         String confirmPassword = registrationPage.getConfirmPasswordField().getText();
+        LocalDate date = registrationPage.getBirthdayField().getValue();
 
-        if (!validateAllFields(name, surname, email, username, password, confirmPassword))
+        if (!inputValidator.isNameValid(name)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
             return;
+        }
+        if (!inputValidator.isLastnameValid(lastname)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
 
-        boolean success = createNewPlayer(name, surname, email, username, password);
+        if (!inputValidator.isUsernameValid(username)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
+        if (registerPageDAO.usernameExists(username)) {
+            registrationPage.showErrorMessage(registerPageDAO.getErrorMessage());
+            return;
+        }
 
-        if (success) {
-            registrationPage.showErrorMessage("");
-            System.out.println("Registration successful! Welcome, " + name + "!");
+        if (!inputValidator.isEmailValid(email)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
+        if (registerPageDAO.emailExists(email)) {
+            registrationPage.showErrorMessage(registerPageDAO.getErrorMessage());
+            return;
+        }
 
-            handleBackToLogin();
+        if (!inputValidator.isPasswordValid(password)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
+        if (!inputValidator.arePasswordsEqual(password, confirmPassword)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
+        if (!inputValidator.isAgeValid(date)) {
+            registrationPage.showErrorMessage(inputValidator.getErrorMessage());
+            return;
+        }
 
-        } else
-            registrationPage.showErrorMessage("Registration failed! Username or email already exists.");
+        Player newPlayer = new Player(0, name, lastname, email, username, password, new Date(), 0.0f, 0);
+        EmailService.getInstance().sendVerificationEmail(email, VerificatonService.getInstance().generateToken(email));
+        registrationPage.getVerificationStage().show();
+
+        handleVerifyEmail(email, newPlayer);
+        handleResendCode(email);
     }
 
-    private boolean validateAllFields(String name, String surname, String email,
-                                      String username, String password, String confirmPassword) {
+    private void handleVerifyEmail(String email, Player newPlayer) {
+        registrationPage.getVerifyAccountButton().setOnAction(event -> {
+            String code = registrationPage.getCodeField().getText();
 
-        RegistrationValidator validator = new RegistrationValidator();
-        if (!validator.isNameValid(name)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        if (!validator.isSurnameValid(surname)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        if (!validator.isEmailValid(email)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        if (!validator.isUsernameValid(username)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        if (usernameExists(username)) {
-            registrationPage.showErrorMessage("Username already exists!");
-            return false;
-        }
-
-        if (emailExists(email)) {
-            registrationPage.showErrorMessage("Email already registered!");
-            return false;
-        }
-
-        if (!validator.isPasswordValid(password)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        if (!validator.doPasswordMatch(password, confirmPassword)) {
-            registrationPage.showErrorMessage(validator.getErrorMessage());
-            return false;
-        }
-
-        return true;
+            if (!VerificatonService.getInstance().verifyToken(email, code)) {
+                registrationPage.showVerificationErrorMessage(VerificatonService.getInstance().getErrorMessage());
+                registrationPage.showErrorMessage(VerificatonService.getInstance().getErrorMessage());
+                return;
+            }
+            if (!registerPageDAO.createPlayer(newPlayer)) {
+                registrationPage.getVerificationStage().close();
+                registrationPage.showVerificationErrorMessage(registerPageDAO.getErrorMessage());
+                registrationPage.showErrorMessage(registerPageDAO.getErrorMessage());
+                return;
+            }
+            registrationPage.getVerificationStage().close();
+            GameManager.getInstance().setCurrentPlayer(newPlayer);
+            GameManager.getInstance().setCurrentController(new LoginPageController());
+        });
     }
 
-    private boolean createNewPlayer(String name, String surname, String email, String username, String password) {
+    private void handleResendCode(String email) {
+        registrationPage.getResendCodeButton().setOnAction(event ->
+                EmailService.getInstance().sendVerificationEmail(email, VerificatonService.getInstance().generateToken(email)));
+    }
 
-        Player newPlayer = new Player(
-                0,
-                name,
-                surname,
-                email,
-                username,
-                password,
-                new Date(),
-                0.0f,
-                0
-        );
-
-        System.out.println("New player created: " + newPlayer);
-
-        return true;
+    private void handleChangeData() {
+        registrationPage.getVerificationStage().close();
     }
 
     @Override
@@ -135,12 +143,4 @@ public class RegistrationPageController extends Controller {
         GameManager.getInstance().setCurrentController(new LoginPageController());
     }
 
-    private boolean usernameExists(String username) {
-        return username.equalsIgnoreCase("player1") ||
-                username.equalsIgnoreCase("admin");
-    }
-
-    private boolean emailExists(String email) {
-        return email.equalsIgnoreCase("player1@mail.com");
-    }
 }

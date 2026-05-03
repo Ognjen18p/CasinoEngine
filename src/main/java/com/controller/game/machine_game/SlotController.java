@@ -1,7 +1,8 @@
 package com.controller.game.machine_game;
 
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
+import com.application.configuration.GameSettings;
+import com.application.utilities.Vector2;
+import com.basis.game.Game;
 import com.basis.game.machine_game.Reel;
 import com.basis.game.machine_game.Slot;
 import com.basis.game.machine_game.symbols.SymbolInfo;
@@ -9,7 +10,7 @@ import com.controller.Controller;
 import com.stylization.game.SlotStylization;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
-import com.manager.GameManager;
+import com.application.GameManager;
 
 public class SlotController extends Controller {
     private Slot slot;
@@ -63,7 +64,7 @@ public class SlotController extends Controller {
     private void handleSpin() {
         slot.getSpinButton().setOnAction(event -> {
             if (slot.getBet() > slot.getMinimumBet()) {
-                slot.setBalance(slot.getBalance() - slot.getBet());
+                GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() - slot.getBet());
                 for (Reel reel : slot.getReels())
                     reel.replacement();
                 slot.getSpinButton().setDisable(true);
@@ -105,7 +106,7 @@ public class SlotController extends Controller {
                     allStopped = allStopped && stopped;
                 if (allStopped) {
                     checkWinner();
-                    slot.getSpinButton().setDisable(slot.getBalance() < slot.getMinimumBet());
+                    slot.getSpinButton().setDisable(GameManager.getInstance().getCurrentPlayer().getBalance() < slot.getMinimumBet());
                     stop();
                 }
             }
@@ -139,7 +140,7 @@ public class SlotController extends Controller {
 //        totalwin += winAmount;
 //        if (winAmount > 0) hits++;
         if (winAmount >= 0)
-            slot.setBalance(slot.getBalance() + winAmount * slot.getBet());
+            GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + winAmount * slot.getBet());
     }
 
 }

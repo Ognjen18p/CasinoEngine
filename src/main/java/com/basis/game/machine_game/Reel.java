@@ -1,6 +1,6 @@
 package com.basis.game.machine_game;
 
-import com.basis.game.essentials.Vector2;
+import com.application.utilities.Vector2;
 import com.basis.game.machine_game.symbols.Symbol;
 import com.basis.game.machine_game.symbols.SymbolType;
 import javafx.scene.Node;

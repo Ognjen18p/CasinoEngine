@@ -1,14 +1,13 @@
 package com.controller.game.table_game;
 
-import com.basis.game.essentials.GameSettings;
+import com.application.configuration.GameSettings;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.Chip;
 import com.basis.game.table_game.ChipShop;
 import com.basis.game.table_game.roulette.Ball;
 import com.basis.game.table_game.roulette.Field;
 import com.basis.game.table_game.roulette.Roulette;
-import com.basis.game.essentials.Vector2;
-import com.controller.game.TableGameController;
+import com.application.utilities.Vector2;
 import com.stylization.game.RouletteStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
@@ -16,7 +15,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
-import com.manager.GameManager;
+import com.application.GameManager;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -224,7 +223,7 @@ public class RouletteController extends TableGameController {
         }
         if(win) {
             roulette.setWin(roulette.getWin() + roulette.getBet() * roulette.getBettingField().getWinMultiplier());
-            roulette.setBalance(roulette.getBalance() + roulette.getBet() * roulette.getBettingField().getWinMultiplier());
+            GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + roulette.getBet() * roulette.getBettingField().getWinMultiplier());
             for(Chip chip : new ArrayList<>(roulette.getBettingChips()))
                 selectingChip(chip);
         }

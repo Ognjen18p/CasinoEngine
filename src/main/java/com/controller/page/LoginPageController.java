@@ -1,18 +1,19 @@
 package com.controller.page;
 
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
+import com.application.configuration.GameSettings;
 import com.basis.page.LoginPage;
-import com.basis.security.LoginValidator;
+import com.basis.person.Player;
+import com.controller.security.InputValidator;
 import com.controller.Controller;
-import com.controller.page.in_game_pages.MenuPageController;
+import com.database.page.LoginPageDAO;
 import com.stylization.page.LoginPageStylization;
 import javafx.scene.Scene;
-import com.manager.GameManager;
+import com.application.GameManager;
 
 public class LoginPageController extends Controller {
 
     private LoginPage loginPage;
+    private LoginPageDAO loginPageDAO;
 
     public LoginPageController() {
         initializeScene();
@@ -22,34 +23,32 @@ public class LoginPageController extends Controller {
     @Override
     protected void initializeScene() {
         loginPage = new LoginPage();
+        loginPageDAO = new LoginPageDAO();
+        scene = new Scene(loginPage.getMainLayout(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
 
-        scene = new Scene(loginPage.getMainLayout(), GameSettings.getInstance().getWindowWidth(),  GameSettings.getInstance().getWindowHeight());
-
-        LoginPageStylization loginPageStylization = new LoginPageStylization(loginPage);
+        new LoginPageStylization(loginPage);
     }
 
     @Override
     protected void setupEventHandlers() {
-        handleLogin();
-        handleCreateNew();
+        loginPage.getLoginButton().setOnAction(event -> handleLogin());
+
+        loginPage.getCreateAccountButton().setOnAction(event -> handleCreateNew());
     }
 
     private void handleLogin() {
-        loginPage.getLoginButton().setOnAction(event -> {
-            LoginValidator loginValidator = new LoginValidator();
-            String username = loginPage.getUsernameField().getText().trim();
-            String password = loginPage.getPasswordField().getText();
+        String username = loginPage.getUsernameField().getText();
+        String password = loginPage.getPasswordField().getText();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                loginPage.showErrorMessage("Username and password cannot be empty!");
-                return;
-            }
-
-            loginPage.showErrorMessage("");
-            loginPage.resetInputFields();
-
+        Player player = loginPageDAO.findPlayer(username, password);
+        if (player != null) {
+            GameManager.getInstance().setCurrentPlayer(player);
             GameManager.getInstance().setCurrentController(new MenuPageController());
-        });
+            return;
+        }
+
+        loginPage.showErrorMessage(loginPageDAO.getErrorMessage());
+        loginPage.resetInputFields();
     }
 
     @Override

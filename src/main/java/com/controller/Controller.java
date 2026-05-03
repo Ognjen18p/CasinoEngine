@@ -1,7 +1,6 @@
 package com.controller;
 
 import javafx.scene.Scene;
-import com.manager.GameManager;
 
 public abstract class Controller {
     protected Scene scene;

@@ -1,6 +1,7 @@
 package com.basis.game.table_game.roulette;
 
-import com.basis.game.essentials.Vector2;
+import com.application.GameManager;
+import com.application.utilities.Vector2;
 import com.basis.game.table_game.TableGame;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -69,7 +70,7 @@ public class Roulette extends TableGame {
         betLabel.setTranslateX(100);
         betLabel.setTranslateY(350);
 
-        balanceLabel = new Label(balance + " BALANCE");
+        balanceLabel = new Label(GameManager.getInstance().getCurrentPlayer().getBalance() + " BALANCE");
         balanceLabel.setTranslateX(60);
         balanceLabel.setTranslateY(50);
 

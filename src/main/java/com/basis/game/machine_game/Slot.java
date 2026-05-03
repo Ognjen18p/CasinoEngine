@@ -1,20 +1,16 @@
 package com.basis.game.machine_game;
 
+import com.application.GameManager;
 import com.basis.game.Game;
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
-import com.basis.game.machine_game.symbols.Symbol;
-import com.basis.game.machine_game.symbols.SymbolInfo;
-import com.basis.game.machine_game.symbols.SymbolType;
+import com.application.configuration.GameSettings;
+import com.application.utilities.Vector2;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Slot extends Game {
     private final int minimumBet;
@@ -93,7 +89,7 @@ public class Slot extends Game {
 //        removeBetButton.setLayoutX(750);
 //        removeBetButton.setLayoutY(500);
 
-        balanceLabel = new Label(balance + " BALANCE");
+        balanceLabel = new Label(GameManager.getInstance().getCurrentPlayer().getBalance() + " BALANCE");
 //        balanceLabel.setTranslateX(850);
 //        balanceLabel.setTranslateY(750);
 

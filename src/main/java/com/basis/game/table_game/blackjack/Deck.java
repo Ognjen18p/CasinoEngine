@@ -1,6 +1,6 @@
 package com.basis.game.table_game.blackjack;
 
-import com.basis.game.essentials.Vector2;
+import com.application.utilities.Vector2;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;

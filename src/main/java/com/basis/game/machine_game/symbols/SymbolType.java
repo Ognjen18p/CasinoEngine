@@ -6,7 +6,7 @@ public enum SymbolType implements SymbolInfo {
     SAI("SAI", "/images/SlotImages/sai.png",  15, new int[]{0, 0, 3, 6, 20}),
     KUNAI("KUNAI", "/images/SlotImages/kunai.png", 10, new int[]{0, 0, 4, 8, 40}),
     KATANA("KATANA", "/images/SlotImages/katana.png", 5, new int[]{0, 0, 5, 10, 50});
-//    MASK("MASK", "/images/SlotImages/ninja_mask.png", 75),
+//    MASK("MASK", "/images/SlotImages/ninja_mask.png", 5),
 
     private final String id;
     private final String imagePath;

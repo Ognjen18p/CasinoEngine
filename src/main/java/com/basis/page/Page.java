@@ -1,23 +1,27 @@
 package com.basis.page;
 
-import com.basis.game.essentials.GameSettings;
-import com.basis.game.essentials.Vector2;
-import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 public abstract class Page {
     protected Label errorMessageLabel;
+
+    protected HBox headerBox;
+    protected VBox contentBox;
+    protected HBox footerBox;
+
     protected Label footerLabel;
     protected Label titleLabel;
-    protected VBox mainLayout;
-    protected VBox buttonBox;
+    protected BorderPane mainLayout;
 
-    protected abstract void initializeElements();
-
-    public Page() {
+    protected Page(){
         initializeElements();
     }
+
+    protected abstract void initializeElements();
 
     public Label getErrorMessageLabel() {
         return errorMessageLabel;
@@ -27,12 +31,12 @@ public abstract class Page {
         return titleLabel;
     }
 
-    public VBox getMainLayout() {
+    public BorderPane getMainLayout() {
         return mainLayout;
     }
 
-    public VBox getButtonBox() {
-        return buttonBox;
+    public VBox getContentBox() {
+        return contentBox;
     }
 
     public void showErrorMessage(String errorMessage) {

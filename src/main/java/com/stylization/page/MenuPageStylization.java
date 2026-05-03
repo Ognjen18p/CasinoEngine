@@ -1,6 +1,6 @@
 package com.stylization.page;
 
-import com.basis.page.in_game_pages.MenuPage;
+import com.basis.page.MenuPage;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
