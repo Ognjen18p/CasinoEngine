@@ -3,7 +3,7 @@ package com.basis.game.table_game.blackjack;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class Card {
+public class PlayingCard {
     public enum Rank {
         ONE(1),
         TWO(2),
@@ -64,7 +64,7 @@ public class Card {
         this.image = image;
     }
 
-    public Card(Rank rank, Suit suit, double xPos, double yPos) {
+    public PlayingCard(Rank rank, Suit suit, double xPos, double yPos) {
         this.rank = rank;
         this.suit = suit;
         image = new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/" + suit.toString() + "/" + rank.toString() + "of" + suit.toString() + ".png").toExternalForm()));
@@ -74,7 +74,7 @@ public class Card {
         image.setFitWidth(60);
     }
 
-    public Card(double xPos, double yPos) {
+    public PlayingCard(double xPos, double yPos) {
         rank = null;
         suit = null;
         image = new ImageView();
@@ -82,7 +82,7 @@ public class Card {
         image.setY(yPos);
     }
 
-    public Card(ImageView image,Rank rank, Suit suit, double xPos, double yPos) {
+    public PlayingCard(ImageView image, Rank rank, Suit suit, double xPos, double yPos) {
         this.image = image;
         this.image.setX(xPos);
         this.image.setY(yPos);

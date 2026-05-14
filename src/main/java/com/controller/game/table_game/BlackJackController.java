@@ -3,7 +3,7 @@ package com.controller.game.table_game;
 import com.application.configuration.GameSettings;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.BlackJack;
-import com.basis.game.table_game.blackjack.Card;
+import com.basis.game.table_game.blackjack.PlayingCard;
 import com.basis.game.table_game.blackjack.Chip;
 import com.basis.game.table_game.ChipShop;
 import com.stylization.game.BlackJackStylization;
@@ -135,7 +135,7 @@ public class BlackJackController extends TableGameController {
 
     private enum Puller {PLAYER, DEALER}
 
-    private Transition pullCard(boolean flipped, Puller puller, Card card, Card destination) {
+    private Transition pullCard(boolean flipped, Puller puller, PlayingCard card, PlayingCard destination) {
         destination.setRank(card.getRank());
         destination.setSuit(card.getSuit());
 
@@ -392,12 +392,12 @@ public class BlackJackController extends TableGameController {
 
     private Transition removeCards() {
         SequentialTransition parallelTransition = new SequentialTransition();
-        for (Card nCard : blackJack.getPlayerCards()) {
+        for (PlayingCard nCard : blackJack.getPlayerCards()) {
             TranslateTransition moveCard = new TranslateTransition(Duration.millis(1100), nCard.getImage());
             moveCard.setByY(-400 - nCard.getImage().getY());
             parallelTransition.getChildren().add(moveCard);
         }
-        for (Card nCard : blackJack.getDealerCards()) {
+        for (PlayingCard nCard : blackJack.getDealerCards()) {
             TranslateTransition moveCard = new TranslateTransition(Duration.millis(1100), nCard.getImage());
             moveCard.setByY(-400 - nCard.getImage().getY());
             parallelTransition.getChildren().add(moveCard);

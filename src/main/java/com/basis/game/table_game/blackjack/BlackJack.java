@@ -41,12 +41,12 @@ public class BlackJack extends TableGame {
     private Button dealButton;
     private Button hitButton;
     private Button standButton;
-    private Card dealersFlippedCard;
+    private PlayingCard dealersFlippedPlayingCard;
     private Deck deck;
-    private ArrayList<Card> dealerSlots;
-    private ArrayList<Card> playerSlots;
-    private ArrayList<Card> playerCards;
-    private ArrayList<Card> dealerCards;
+    private ArrayList<PlayingCard> dealerSlots;
+    private ArrayList<PlayingCard> playerSlots;
+    private ArrayList<PlayingCard> playerCards;
+    private ArrayList<PlayingCard> dealerCards;
 
     public BlackJack() {
         initializeElements();
@@ -128,15 +128,15 @@ public class BlackJack extends TableGame {
         return standButton;
     }
 
-    public Card getDealersFlippedCard() {
-        return dealersFlippedCard;
+    public PlayingCard getDealersFlippedCard() {
+        return dealersFlippedPlayingCard;
     }
 
-    public ArrayList<Card> getDealerSlots() {
+    public ArrayList<PlayingCard> getDealerSlots() {
         return dealerSlots;
     }
 
-    public ArrayList<Card> getPlayerSlots() {
+    public ArrayList<PlayingCard> getPlayerSlots() {
         return playerSlots;
     }
 
@@ -152,11 +152,11 @@ public class BlackJack extends TableGame {
         return currentFreeSlot;
     }
 
-    public ArrayList<Card> getPlayerCards() {
+    public ArrayList<PlayingCard> getPlayerCards() {
         return playerCards;
     }
 
-    public ArrayList<Card> getDealerCards() {
+    public ArrayList<PlayingCard> getDealerCards() {
         return dealerCards;
     }
 
@@ -197,7 +197,7 @@ public class BlackJack extends TableGame {
         winLabel.setTranslateX(120);
         winLabel.setTranslateY(500);
 
-        totalWinLabel = new Label("Total win value: " + totalWin);
+        totalWinLabel = new Label("Total win value: " + totalWins);
         totalWinLabel.setTranslateX(200);
         totalWinLabel.setTranslateY(250);
 
@@ -242,7 +242,7 @@ public class BlackJack extends TableGame {
         deck = new Deck(new Vector2(900, 100));
         deck.fill();
 
-        dealersFlippedCard = new Card(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
+        dealersFlippedPlayingCard = new PlayingCard(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
 
         mainPane.getChildren().addAll(depositButton, exitButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
                 dealButton, hitButton, standButton, bettingChips.getFirst().getImage());
@@ -260,13 +260,13 @@ public class BlackJack extends TableGame {
         playerSlots = new ArrayList<>();
 
         for (int nCard = 0; nCard < BLACKJACK; nCard++) {
-            Card card = new Card(padding, 150);
+            PlayingCard card = new PlayingCard(padding, 150);
             padding += 20;
             dealerSlots.add(card);
         }
         padding = 300;
         for (int nCard = 0; nCard < BLACKJACK; nCard++) {
-            Card card = new Card(padding, 250);
+            PlayingCard card = new PlayingCard(padding, 250);
             padding += 20;
             playerSlots.add(card);
         }
@@ -278,14 +278,14 @@ public class BlackJack extends TableGame {
         });
     }
 
-    public void addScorePlayer(Card card) {
+    public void addScorePlayer(PlayingCard card) {
         if (card.getRank() != null) {
             int currentScore = playerScore + card.getRank().getValue();
             if (currentScore > BLACKJACK) {
-                for (Card nCard : playerSlots) {
-                    if (nCard.getRank() == Card.Rank.ACE) {
+                for (PlayingCard nPlayingCard : playerSlots) {
+                    if (nPlayingCard.getRank() == PlayingCard.Rank.ACE) {
                         setPlayerScore(currentScore - 10);
-                        nCard.setRank(Card.Rank.ONE);
+                        nPlayingCard.setRank(PlayingCard.Rank.ONE);
                         return;
                     }
                 }
@@ -294,14 +294,14 @@ public class BlackJack extends TableGame {
         }
     }
 
-    public void addScoreDealer(Card card) {
+    public void addScoreDealer(PlayingCard card) {
         if (card.getRank() != null) {
             int currentScore = dealerScore + card.getRank().getValue();
             if (currentScore > BLACKJACK) {
-                for (Card nCard : dealerSlots) {
-                    if (nCard.getRank() == Card.Rank.ACE) {
+                for (PlayingCard nPlayingCard : dealerSlots) {
+                    if (nPlayingCard.getRank() == PlayingCard.Rank.ACE) {
                         setDealerScore(currentScore - 10);
-                        nCard.setRank(Card.Rank.ONE);
+                        nPlayingCard.setRank(PlayingCard.Rank.ONE);
                         return;
                     }
                 }
@@ -324,7 +324,7 @@ public class BlackJack extends TableGame {
         lastBet = bet;
         bet = 0;
 
-        dealersFlippedCard.getImage().setImage(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm()));
+        dealersFlippedPlayingCard.getImage().setImage(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm()));
 
         dealerFreeSlot = 0;
         playerFreeSlot = 0;

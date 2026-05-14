@@ -20,7 +20,7 @@ public abstract class Game {
     protected int bet;
     protected int lastBet;
     protected int win;
-    protected int totalWin;
+    protected int totalWins;
     protected int lastWin;
 
     protected boolean isPlaying = false;
@@ -28,7 +28,7 @@ public abstract class Game {
     protected void initializeElements() {
         bet = 0;
         lastBet = lastBet;
-        totalWin = totalWin;
+        totalWins = totalWins;
         lastWin = lastWin;
         win = 0;
 
@@ -36,7 +36,7 @@ public abstract class Game {
         mainPane.setPrefSize(GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
         depositButton = new Button("Deposit");
         exitButton = new Button("Exit");
-        totalWinLabel = new Label(Integer.toString(totalWin));
+        totalWinLabel = new Label(Integer.toString(totalWins));
         lastWinLabel = new Label(Integer.toString(lastWin));
         betLabel = new Label(Integer.toString(bet));
     }
@@ -47,7 +47,7 @@ public abstract class Game {
 //                "balance=" + balance +
                 ", bet=" + bet +
                 ", lastBet=" + lastBet +
-                ", totalWin=" + totalWin +
+                ", totalWins=" + totalWins +
                 ", lastWin=" + lastWin +
                 '}';
     }
@@ -70,7 +70,7 @@ public abstract class Game {
     }
 
     public int getTotalWin() {
-        return totalWin;
+        return totalWins;
     }
 
     public int getWin() {
@@ -90,9 +90,9 @@ public abstract class Game {
         return textMessageLabel;
     }
 
-    public void setTotalWin(int totalWin) {
-        this.totalWin = totalWin;
-        totalWinLabel.setText(Integer.toString(totalWin)+ " TOTAL WIN");
+    public void setTotalWin(int totalWins) {
+        this.totalWins = totalWins;
+        totalWinLabel.setText(Integer.toString(totalWins)+ " TOTAL WIN");
     }
 
     public Label getBalanceLabel() {

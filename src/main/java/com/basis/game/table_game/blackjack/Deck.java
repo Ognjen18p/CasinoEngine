@@ -12,7 +12,7 @@ public class Deck {
     private int firstInDeck = 0;
     private Vector2 position;
 
-    private ArrayList<Card> cards = new ArrayList<>();
+    private ArrayList<PlayingCard> cards = new ArrayList<>();
 
     public Deck(Vector2 position) {
         this.position = position;
@@ -30,13 +30,13 @@ public class Deck {
         return NUMBER_OF_DECKS;
     }
 
-    public ArrayList<Card> fill() {
+    public ArrayList<PlayingCard> fill() {
         cards.clear();
         firstInDeck = 0;
         for (int nDeck = 0; nDeck < NUMBER_OF_DECKS; nDeck++) {
             for (int nRank = 1; nRank < NUMBER_OF_RANKS; nRank++) {
                 for (int nSuit = 0; nSuit < NUMBER_OF_SUITS; nSuit++) {
-                    Card newCard = new Card(Card.Rank.values()[nRank], Card.Suit.values()[nSuit], position.getX(), position.getY());
+                    PlayingCard newCard = new PlayingCard(PlayingCard.Rank.values()[nRank], PlayingCard.Suit.values()[nSuit], position.getX(), position.getY());
                     newCard.getImage().setRotate(20);
                     cards.add(newCard);
                 }
@@ -48,18 +48,18 @@ public class Deck {
 
     public void shuffle() {
         for (int nCard = cards.size() - 1; nCard > 0; nCard--) {
-            Card swapCard = cards.get(nCard);
+            PlayingCard swapCard = cards.get(nCard);
             int randomPos = ThreadLocalRandom.current().nextInt(0, cards.size());
             cards.set(nCard, cards.get(randomPos));
             cards.set(randomPos, swapCard);
         }
     }
 
-    public Card drawCard() {
+    public PlayingCard drawCard() {
         return cards.get(firstInDeck++);
     }
 
-    public ArrayList<Card> getCards() {
+    public ArrayList<PlayingCard> getCards() {
         return cards;
     }
 }

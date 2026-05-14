@@ -69,7 +69,7 @@ public class Slot extends Game {
 //        winLabel.setTranslateX(120);
 //        winLabel.setTranslateY(700);
 
-        totalWinLabel = new Label("Total win value: " + totalWin);
+        totalWinLabel = new Label("Total win value: " + totalWins);
 //        totalWinLabel.setTranslateX(300);
 //        totalWinLabel.setTranslateY(700);
 

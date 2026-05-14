@@ -60,7 +60,7 @@ public class MenuPageController extends Controller {
     }
 
     private void handleDeposit() {
-        menuPage.showErrorMessage("Deposit feature coming soon!");
+        GameManager.getInstance().setCurrentController(new DepositPageController());
     }
 
     private void handleChat() {

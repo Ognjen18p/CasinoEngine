@@ -1,14 +1,14 @@
-package com.basis.person.data;
+package com.basis.card;
 
 import java.time.LocalDate;
 
-public class DebitCard {
+public class Card {
     private int cardId;
     private String cardNumberHash;
     private String cardholderName;
     private LocalDate expiryDate;
 
-    public DebitCard(int cardId, String cardNumberHash, String cardholderName, LocalDate expiryDate) {
+    public Card(int cardId, String cardNumberHash, String cardholderName, LocalDate expiryDate) {
         this.cardId = cardId;
         this.cardNumberHash = cardNumberHash;
         this.cardholderName = cardholderName;

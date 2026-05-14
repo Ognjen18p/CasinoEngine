@@ -58,7 +58,7 @@ public class Roulette extends TableGame {
         winLabel.setTranslateX(120);
         winLabel.setTranslateY(500);
 
-        totalWinLabel = new Label("Total win value: " + totalWin);
+        totalWinLabel = new Label("Total win value: " + totalWins);
         totalWinLabel.setTranslateX(200);
         totalWinLabel.setTranslateY(250);
 
