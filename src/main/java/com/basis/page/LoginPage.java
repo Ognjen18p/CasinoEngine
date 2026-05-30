@@ -39,10 +39,6 @@ public class LoginPage extends Page {
         return createAccountButton;
     }
 
-    public void resetInputFields() {
-        usernameField.clear();
-        passwordField.clear();
-    }
 
     @Override
     public void initializeElements() {

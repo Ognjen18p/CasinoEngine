@@ -3,7 +3,6 @@ package com.controller.page;
 import com.application.configuration.GameSettings;
 import com.basis.page.LoginPage;
 import com.basis.person.Player;
-import com.controller.security.InputValidator;
 import com.controller.Controller;
 import com.database.page.LoginPageDAO;
 import com.stylization.page.LoginPageStylization;
@@ -48,7 +47,6 @@ public class LoginPageController extends Controller {
         }
 
         loginPage.showErrorMessage(loginPageDAO.getErrorMessage());
-        loginPage.resetInputFields();
     }
 
     @Override

@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage mainStage) {
-        DatabaseManager.initialize("jdbc:mysql://localhost:3306/casino_engine", "ognjen", "");
+        DatabaseManager.initialize("jdbc:mysql://localhost:3306/casino_engine", "root", "");
         GameManager.getInstance().initializeElements(mainStage);
         new LoginPageController().showScene();
     }

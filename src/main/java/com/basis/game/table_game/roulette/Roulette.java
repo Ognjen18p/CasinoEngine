@@ -74,11 +74,13 @@ public class Roulette extends TableGame {
         balanceLabel.setTranslateX(60);
         balanceLabel.setTranslateY(50);
 
-        depositButton.setTranslateX(100);
+        depositButton.setTranslateX(200);
         depositButton.setTranslateY(50);
+        depositButton.setPrefWidth(200);
 
         exitButton.setTranslateX(700);
         exitButton.setTranslateY(50);
+        exitButton.setPrefWidth(200);
 
         chipShopButton = new Button("Chip Shop");
         chipShopButton.setTranslateX(700);
@@ -95,7 +97,7 @@ public class Roulette extends TableGame {
         wheel.getTable().setLayoutY(100);
         wheel.getTable().setVisible(false);
 
-        mainPane.getChildren().addAll(wheel.getTable(), spinButton, layout.getMainPane(),depositButton, exitButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel);
+        mainPane.getChildren().addAll(wheel.getTable(), spinButton, layout.getMainPane(),depositButton,  chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, exitButton, betLabel);
     }
 
 }

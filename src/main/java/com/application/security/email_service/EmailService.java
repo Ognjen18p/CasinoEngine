@@ -1,4 +1,4 @@
-package com.controller.security.email_service;
+package com.application.security.email_service;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;

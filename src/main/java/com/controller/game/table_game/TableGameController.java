@@ -3,8 +3,9 @@ package com.controller.game.table_game;
 import com.basis.game.table_game.TableGame;
 import com.basis.game.table_game.blackjack.Chip;
 import com.controller.Controller;
+import com.controller.game.GameController;
 
-public abstract class TableGameController extends Controller {
+public abstract class TableGameController extends GameController {
 
     protected abstract void selectingChip(Chip chip);
 

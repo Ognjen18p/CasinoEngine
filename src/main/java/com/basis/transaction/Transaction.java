@@ -25,15 +25,12 @@ public class Transaction {
     private Date timeCreated;
     private Date timeFinished;
 
-    public Transaction(int transactionID, int cardId, int personId, double amount, Status status, Type type, Date timeCreated, Date timeFinished) {
-        this.transactionID = transactionID;
+    public Transaction(int cardId, int personId, double amount, Status status, Type type) {
         this.cardId = cardId;
         this.personId = personId;
         this.amount = amount;
         this.status = status;
         this.type = type;
-        this.timeCreated = timeCreated;
-        this.timeFinished = timeFinished;
     }
 
     public int getTransactionID() {

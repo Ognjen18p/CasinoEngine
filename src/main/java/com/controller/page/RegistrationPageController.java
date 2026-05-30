@@ -1,18 +1,16 @@
 package com.controller.page;
 
 import com.application.configuration.GameSettings;
-import com.basis.game.Game;
 import com.basis.page.RegistrationPage;
 import com.basis.person.Player;
-import com.controller.security.InputValidator;
+import com.application.security.InputValidator;
 import com.controller.Controller;
 import com.application.GameManager;
-import com.controller.security.email_service.EmailService;
-import com.controller.security.email_service.VerificatonService;
+import com.application.security.email_service.EmailService;
+import com.application.security.email_service.VerificatonService;
 import com.database.page.RegisterPageDAO;
 import com.stylization.page.RegistrationPageStylization;
 import javafx.scene.Scene;
-import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -136,7 +134,7 @@ public class RegistrationPageController extends Controller {
     @Override
     public void showScene() {
         GameManager.getInstance().setMainScene(scene);
-        GameManager.getInstance().getMainStage().setTitle("Casino Engine - Register");
+        GameManager.getInstance().getMainStage().setTitle("Casino Engine - Registration");
     }
 
     private void handleBackToLogin() {

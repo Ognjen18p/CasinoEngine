@@ -1,4 +1,4 @@
-package com.controller.security;
+package com.application.security;
 
 import static com.application.configuration.CasinoConfiguration.*;
 

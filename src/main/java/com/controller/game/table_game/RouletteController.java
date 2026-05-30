@@ -8,6 +8,9 @@ import com.basis.game.table_game.roulette.Ball;
 import com.basis.game.table_game.roulette.Field;
 import com.basis.game.table_game.roulette.Roulette;
 import com.application.utilities.Vector2;
+import com.controller.game.GameController;
+import com.controller.page.CashierPageController;
+import com.controller.page.MenuPageController;
 import com.stylization.game.RouletteStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
@@ -52,6 +55,8 @@ public class RouletteController extends TableGameController {
 
     @Override
     protected void setupEventHandlers() {
+        handleExit(roulette);
+        handleDeposit(roulette);
         handleSpin();
         handleBallStopped();
         handleChipShop();
@@ -60,6 +65,9 @@ public class RouletteController extends TableGameController {
 
     private void handleSpin() {
         roulette.getSpinButton().setOnAction(event -> {
+
+            playerDAO.updateBalance(-roulette.getBet());
+
             roulette.getWheel().getTable().setVisible(true);
             roulette.getWheel().getTable().toFront();
             roulette.getSpinButton().setVisible(false);
@@ -67,8 +75,8 @@ public class RouletteController extends TableGameController {
         });
     }
 
-    private void handleBallStopped(){
-        ball.setOnStopped(() ->{
+    private void handleBallStopped() {
+        ball.setOnStopped(() -> {
             checkWinner(snapBallToPocket());
         });
     }
@@ -158,7 +166,7 @@ public class RouletteController extends TableGameController {
             chip.getButton().setLayoutY(closestFieldPosition.getY() - chip.getButton().getHeight() / 2);
             roulette.setBettingField(closestField);
             roulette.getSpinButton().setVisible(true);
-            if(!chip.isSelected()) {
+            if (!chip.isSelected()) {
                 roulette.setBet(roulette.getBet() + chip.getValue());
                 roulette.getBettingChips().add(chip);
                 roulette.getOwningChips().remove(chip);
@@ -196,7 +204,7 @@ public class RouletteController extends TableGameController {
             Vector2 pocketPosition = new Vector2(bounds.getCenterX(), bounds.getCenterY());
 
             Bounds ballBounds = ball.getImage().localToScene(ball.getImage().getBoundsInLocal());
-            Vector2 ballPosition = new Vector2(ballBounds.getCenterX(),ballBounds.getCenterY());
+            Vector2 ballPosition = new Vector2(ballBounds.getCenterX(), ballBounds.getCenterY());
             double distance = ballPosition.distance(pocketPosition);
 
             if (distance < closestDistance) {
@@ -213,22 +221,20 @@ public class RouletteController extends TableGameController {
         return closestPocket;
     }
 
-    private void checkWinner(int number){
+    private void checkWinner(int number) {
         boolean win = false;
-        for(int value : roulette.getBettingField().getWinValues()){
+        for (int value : roulette.getBettingField().getWinValues()) {
             if (value == number) {
                 win = true;
                 break;
             }
         }
-        if(win) {
-            roulette.setWin(roulette.getWin() + roulette.getBet() * roulette.getBettingField().getWinMultiplier());
-            GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + roulette.getBet() * roulette.getBettingField().getWinMultiplier());
-            for(Chip chip : new ArrayList<>(roulette.getBettingChips()))
+        if (win) {
+            roulette.setWin(roulette.getBet() * roulette.getBettingField().getWinMultiplier());
+            playerDAO.updateBalance(roulette.getWin());
+            for (Chip chip : new ArrayList<>(roulette.getBettingChips()))
                 selectingChip(chip);
-        }
-        else {
-            System.out.println(" DEALER WINS! ");
+        } else {
             roulette.setWin(0);
             clearBet().play();
         }

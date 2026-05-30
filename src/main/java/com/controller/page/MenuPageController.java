@@ -2,7 +2,6 @@ package com.controller.page;
 
 import com.application.configuration.GameSettings;
 import com.basis.page.MenuPage;
-import com.basis.person.Player;
 import com.controller.Controller;
 import com.controller.game.machine_game.SlotController;
 import com.controller.game.table_game.BlackJackController;
@@ -60,7 +59,7 @@ public class MenuPageController extends Controller {
     }
 
     private void handleDeposit() {
-        GameManager.getInstance().setCurrentController(new DepositPageController());
+        GameManager.getInstance().setCurrentController(new CashierPageController());
     }
 
     private void handleChat() {

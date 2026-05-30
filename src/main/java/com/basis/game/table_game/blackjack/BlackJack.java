@@ -213,11 +213,13 @@ public class BlackJack extends TableGame {
         balanceLabel.setTranslateX(60);
         balanceLabel.setTranslateY(50);
 
-        depositButton.setTranslateX(100);
+        depositButton.setTranslateX(200);
         depositButton.setTranslateY(50);
+        depositButton.setPrefWidth(200);
 
-        exitButton.setTranslateX(700);
+        exitButton.setTranslateX(600);
         exitButton.setTranslateY(50);
+        exitButton.setPrefWidth(200);
 
         chipShopButton = new Button("Chip Shop");
         chipShopButton.setTranslateX(800);
@@ -244,8 +246,8 @@ public class BlackJack extends TableGame {
 
         dealersFlippedPlayingCard = new PlayingCard(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
 
-        mainPane.getChildren().addAll(depositButton, exitButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
-                dealButton, hitButton, standButton, bettingChips.getFirst().getImage());
+        mainPane.getChildren().addAll(depositButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
+                dealButton, hitButton, standButton,exitButton, bettingChips.getFirst().getImage());
 
         blackJackPhaseState = BlackJackPhaseState.DEAL;
 

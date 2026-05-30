@@ -4,15 +4,20 @@ import java.time.LocalDate;
 
 public class Card {
     private int cardId;
-    private String cardNumberHash;
+    private int personId;
+    private String cardLastFour;
     private String cardholderName;
     private LocalDate expiryDate;
 
-    public Card(int cardId, String cardNumberHash, String cardholderName, LocalDate expiryDate) {
-        this.cardId = cardId;
-        this.cardNumberHash = cardNumberHash;
+    public Card(int personId, String cardNumber, String cardholderName, LocalDate expiryDate) {
+        this.personId = personId;
+        cardLastFour = cardNumber.substring(cardNumber.length() - 4);
         this.cardholderName = cardholderName;
         this.expiryDate = expiryDate;
+    }
+
+    public int getPersonId() {
+        return personId;
     }
 
     public int getCardId() {
@@ -24,11 +29,11 @@ public class Card {
     }
 
     public String getCardNumberHash() {
-        return cardNumberHash;
+        return cardLastFour;
     }
 
-    public void setCardNumberHash(String cardNumberHash) {
-        this.cardNumberHash = cardNumberHash;
+    public void setCardNumberHash(String cardLastFour) {
+        this.cardLastFour = cardLastFour;
     }
 
     public String getCardholderName() {

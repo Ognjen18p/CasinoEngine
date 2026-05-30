@@ -6,6 +6,8 @@ import com.basis.game.table_game.blackjack.BlackJack;
 import com.basis.game.table_game.blackjack.PlayingCard;
 import com.basis.game.table_game.blackjack.Chip;
 import com.basis.game.table_game.ChipShop;
+import com.controller.page.CashierPageController;
+import com.controller.page.MenuPageController;
 import com.stylization.game.BlackJackStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
@@ -22,6 +24,7 @@ public class BlackJackController extends TableGameController {
     private ChipShop chipShop;
 
     public BlackJackController() {
+        super();
         initializeScene();
         setupEventHandlers();
 
@@ -29,6 +32,8 @@ public class BlackJackController extends TableGameController {
 
     @Override
     protected void setupEventHandlers() {
+        handleExit(blackJack);
+        handleDeposit(blackJack);
         handleDeal();
         handleHit();
         handleStand();
@@ -55,10 +60,10 @@ public class BlackJackController extends TableGameController {
 
     @Override
     protected void purchasedChip(TableGame game) {
-        game.getOwningChips().addListener((ListChangeListener<Chip>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    for (Chip chip : change.getAddedSubList()) {
+        game.getOwningChips().addListener((ListChangeListener<Chip>) chips -> {
+            while (chips.next()) {
+                if (chips.wasAdded()) {
+                    for (Chip chip : chips.getAddedSubList()) {
                         if (chip.getButton() != null)
                             chip.getButton().setOnAction(actionEvent -> selectingChip(chip));
                     }
@@ -167,6 +172,7 @@ public class BlackJackController extends TableGameController {
     }
 
     private void deal() {
+        playerDAO.updateBalance(-blackJack.getBet());
         SequentialTransition sequentialTransition = new SequentialTransition();
         sequentialTransition.getChildren().addAll(
                 pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot())),
@@ -326,7 +332,6 @@ public class BlackJackController extends TableGameController {
                 blackJack.getBettingChips().remove(aChip);
                 blackJack.getOwningChips().add(aChip);
             }
-            GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + blackJack.getBet());
             blackJack.setWin(0);
         });
         return sequentialTransition;
@@ -351,15 +356,16 @@ public class BlackJackController extends TableGameController {
             }
         }
         sequentialTransition.setOnFinished(event -> {
+            int addBalance = (blackJack.getBet() * 2);
             for (Chip aChip : addChips) {
-                int addBalance = (blackJack.getBet() * 2);
                 if (blackJack.getBlackJackWinState() == BlackJack.BlackJackWinState.PLAYER_BLACKJACK)
-                    addBalance = ((int) (blackJack.getBet() * 2.5));
+                    addBalance = (int)(addBalance * 1.5);
 
                 blackJack.setWin(addBalance);
                 blackJack.setLastWin(addBalance);
                 blackJack.setTotalWin(blackJack.getTotalWin() + addBalance);
-                GameManager.getInstance().getCurrentPlayer().setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + addBalance);
+
+                playerDAO.updateBalance(addBalance);
 
                 aChip.setSelected(false);
                 blackJack.getBettingChips().remove(aChip);

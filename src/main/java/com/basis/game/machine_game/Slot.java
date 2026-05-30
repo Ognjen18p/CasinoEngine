@@ -93,11 +93,13 @@ public class Slot extends Game {
 //        balanceLabel.setTranslateX(850);
 //        balanceLabel.setTranslateY(750);
 
-        depositButton.setTranslateX(100);
+        depositButton.setTranslateX(200);
         depositButton.setTranslateY(100);
+        depositButton.setPrefWidth(200);
 
         exitButton.setTranslateX(700);
         exitButton.setTranslateY(100);
+        exitButton.setPrefWidth(200);
 
         border = new ImageView(new Image(getClass().getResource("/images/SlotImages/border_ninja.png").toExternalForm()));
         border.setFitWidth(GameSettings.getInstance().getWindowWidth());

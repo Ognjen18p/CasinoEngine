@@ -7,6 +7,14 @@ import java.util.Date;
 import java.sql.*;
 
 public class TransactionDAO {
+    private static TransactionDAO instance;
+
+    public static TransactionDAO getInstance() {
+        if (instance == null)
+            instance = new TransactionDAO();
+        return instance;
+    }
+
     private String errorMessage = "";
 
     public String getErrorMessage() {
@@ -16,7 +24,8 @@ public class TransactionDAO {
     public boolean createTransaction(Transaction transaction) {
         String query = "INSERT INTO transaction (card_id, person_id, amount, status, type, time_created) " + "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = DatabaseManager.getInstance().getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setInt(1, transaction.getCardId());
+            if (transaction.getCardId() == 0) statement.setNull(1, Types.INTEGER);
+            else statement.setInt(1, transaction.getCardId());
             statement.setInt(2, transaction.getPersonId());
             statement.setDouble(3, transaction.getAmount());
             statement.setString(4, transaction.getStatus().toString());
