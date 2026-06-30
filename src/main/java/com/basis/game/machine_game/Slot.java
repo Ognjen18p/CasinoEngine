@@ -13,14 +13,28 @@ import javafx.scene.layout.HBox;
 import java.util.ArrayList;
 
 public class Slot extends Game {
-    private final int minimumBet;
-    private final int maximumBet;
+    protected final int[][] paylines = {
+            {0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1},
+            {2, 2, 2, 2, 2},
+            {0, 1, 2, 1, 0},
+            {2, 1, 0, 1, 2},
+            {0, 0, 1, 2, 2},
+            {2, 2, 1, 0, 0},
+            {1, 0, 0, 0, 1},
+            {1, 2, 2, 2, 1}
+    };
+
     private final Vector2 slotGridSize;
     private Button spinButton;
     private Button addBetButton;
     private Button removeBetButton;
     private ImageView border;
     private ArrayList<Reel> reels;
+
+    public int[][] getPaylines() {
+        return paylines;
+    }
 
     public Button getSpinButton() {
         return spinButton;
@@ -34,14 +48,6 @@ public class Slot extends Game {
         return addBetButton;
     }
 
-    public int getMinimumBet() {
-        return minimumBet;
-    }
-
-    public int getMaximumBet() {
-        return maximumBet;
-    }
-
     public ArrayList<Reel> getReels() {
         return reels;
     }
@@ -50,10 +56,8 @@ public class Slot extends Game {
         return slotGridSize;
     }
 
-    public Slot( Vector2 slotGridSize, int minimumBet, int maximumBet) {
+    public Slot( Vector2 slotGridSize) {
         this.slotGridSize = slotGridSize;
-        this.minimumBet = minimumBet;
-        this.maximumBet = maximumBet;
         initializeElements();
     }
 

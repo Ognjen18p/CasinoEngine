@@ -12,7 +12,7 @@ public class CashierPage extends Page {
     private Label enterAmountLabel;
     private Button depositButton;
     private Button withdrawButton;
-    private Button backButton;
+    private Button exitButton;
     private TextField amountField;
 
     public Label getEnterAmountLabel() {
@@ -27,8 +27,8 @@ public class CashierPage extends Page {
         return withdrawButton;
     }
 
-    public Button getBackButton() {
-        return backButton;
+    public Button getExitButton() {
+        return exitButton;
     }
 
     public TextField getAmountField() {
@@ -62,15 +62,15 @@ public class CashierPage extends Page {
         HBox buttonBox = new HBox(20, depositButton, withdrawButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        backButton = new Button("Back");
-        backButton.setPrefWidth(140);
+        exitButton = new Button("Back");
+        exitButton.setPrefWidth(140);
 
         errorMessageLabel = new Label("");
 
         contentBox = new VBox(15);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setMaxWidth(350);
-        contentBox.getChildren().addAll(enterAmountLabel, amountField, buttonBox, backButton, errorMessageLabel);
+        contentBox.getChildren().addAll(enterAmountLabel, amountField, buttonBox, exitButton, errorMessageLabel);
 
         /// !!! Footer !!!
         footerLabel = new Label("© 2026 Casino Engine. All rights reserved.");

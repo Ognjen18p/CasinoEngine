@@ -42,7 +42,7 @@ public class Ball {
         startRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX();
         targetRadius = roulette.getWheel().getWheelSize().getX() / 2 - size.getX() * 4;
 
-        image = new ImageView(new Image(getClass().getResource("/images/RouletteImages/ball.png").toExternalForm()));
+        image = new ImageView(new Image(getClass().getResource("/images/TableGames/RouletteImages/ball.png").toExternalForm()));
         image.setFitWidth(size.getX());
         image.setFitHeight(size.getY());
 

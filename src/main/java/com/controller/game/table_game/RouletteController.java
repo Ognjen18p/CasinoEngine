@@ -1,36 +1,31 @@
 package com.controller.game.table_game;
 
 import com.application.configuration.GameSettings;
-import com.basis.game.table_game.TableGame;
-import com.basis.game.table_game.blackjack.Chip;
+import com.basis.game.table_game.Chip;
 import com.basis.game.table_game.ChipShop;
 import com.basis.game.table_game.roulette.Ball;
 import com.basis.game.table_game.roulette.Field;
 import com.basis.game.table_game.roulette.Roulette;
 import com.application.utilities.Vector2;
-import com.controller.game.GameController;
-import com.controller.page.CashierPageController;
-import com.controller.page.MenuPageController;
 import com.stylization.game.RouletteStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.util.Duration;
 import com.application.GameManager;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-public class RouletteController extends TableGameController {
-    private Roulette roulette;
+public class RouletteController extends TableGameController<Roulette> {
     private Ball ball;
-    private ChipShop chipShop;
 
     public RouletteController() {
+        super();
         initializeScene();
-        chipShop = new ChipShop(roulette);
         setupEventHandlers();
     }
 
@@ -41,36 +36,38 @@ public class RouletteController extends TableGameController {
     }
 
     @Override
+    public void onReset() {
+        game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
+    }
+
+    @Override
     protected void initializeScene() {
-        roulette = new Roulette();
+        game = new Roulette();
 
-        ball = new Ball(roulette, new Vector2(22, 22));
+        chipShop = new ChipShop(game, playerDAO, new Vector2(600, 80), new Vector2(100, 300));
 
-        chipShop = new ChipShop(roulette);
+        ball = new Ball(game, new Vector2(22, 22));
 
-        scene = new Scene(roulette.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
-        RouletteStylization stylization = new RouletteStylization(roulette);
+        scene = new Scene(game.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
+        new RouletteStylization(game);
 
     }
 
     @Override
     protected void setupEventHandlers() {
-        handleExit(roulette);
-        handleDeposit(roulette);
+        handleExit(game);
+        handleDeposit(game);
         handleSpin();
         handleBallStopped();
-        handleChipShop();
-        purchasedChip(roulette);
+        purchasedChipsListener();
     }
 
     private void handleSpin() {
-        roulette.getSpinButton().setOnAction(event -> {
+        game.getSpinButton().setOnAction(event -> {
 
-            playerDAO.updateBalance(-roulette.getBet());
-
-            roulette.getWheel().getTable().setVisible(true);
-            roulette.getWheel().getTable().toFront();
-            roulette.getSpinButton().setVisible(false);
+            game.getWheel().getTable().setVisible(true);
+            game.getWheel().getTable().toFront();
+            game.getSpinButton().setVisible(false);
             ball.startBallSpinning();
         });
     }
@@ -81,19 +78,20 @@ public class RouletteController extends TableGameController {
         });
     }
 
-    private void handleChipShop() {
-        roulette.getChipShopButton().setOnAction(actionEvent ->
-                chipShop.getMainPane().setVisible(!chipShop.getMainPane().isVisible()));
-    }
-
     @Override
-    protected void purchasedChip(TableGame game) {
+    protected void purchasedChipsListener() {
         game.getOwningChips().addListener((ListChangeListener<Chip>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (Chip chip : change.getAddedSubList()) {
                         if (chip.getButton() != null) {
+                            chip.getButton().setOnMouseClicked(event -> {
+                                if (event.getButton() == MouseButton.SECONDARY) {
+                                    chipShop.sellChipTransition(chip);
+                                }
+                            });
                             chip.getButton().setOnMousePressed(event -> {
+                                removeFieldChip(chip);
                                 chip.getButton().setTranslateX(0);
                                 chip.getButton().setTranslateY(0);
                             });
@@ -104,50 +102,96 @@ public class RouletteController extends TableGameController {
                             });
 
                             chip.getButton().setOnMouseReleased(event -> {
-                                if (chip.isDragged()) {
-                                    placeDragged(chip);
-                                } else
-                                    selectingChip(chip);
-                                chip.setDragged(false);
+                                if (event.getButton() == MouseButton.PRIMARY) {
+                                    if (chip.isDragged()) {
+                                        placeDragged(chip);
+                                        chip.setDragged(false);
+                                    } else {
+                                        onChipSelected(chip);
+                                    }
+                                }
                             });
                         }
                     }
                 }
             }
         });
+        game.addOwningChips();
+        debugBettingState();
+    }
+
+    private void debugBettingState() {
+        System.out.println("=== BETTING STATE ===");
+        System.out.println("Total bet: " + game.getBet());
+        System.out.println("Betting fields: " + game.getBettingFields().size());
+        for (Field field : game.getBettingFields()) {
+            System.out.println("  Field: " + field.getFieldType() +
+                    " | Multiplier: " + field.getWinMultiplier() +
+                    " | WinValues: " + field.getCoveredNumbers());
+            for (Chip chip : field.getCoveredChips()) {
+                System.out.println("    Chip ref: " + chip.hashCode() +
+                        " | Value: " + chip.getValue() +
+                        " | Selected: " + chip.isSelected());
+            }
+        }
+        System.out.println("Betting chips total: " + game.getBettingChips().size());
+        for (Chip chip : game.getBettingChips()) {
+            System.out.println("  BetChip ref: " + chip.hashCode() +
+                    " | Value: " + chip.getValue());
+        }
+        System.out.println("====================");
     }
 
     @Override
-    protected void selectingChip(Chip chip) {
+    protected void onChipSelected(Chip chip) {
         Chip destinationChip = null;
-        for (Chip nChip : roulette.getOwningChips()) {
+        for (Chip nChip : game.getOwningChips()) {
             if (nChip.getButton() == null && nChip.getValue() == chip.getValue()) {
                 destinationChip = nChip;
                 break;
             }
         }
-        Timeline transition = new Timeline(
-                new KeyFrame(Duration.millis(200),
-                        new KeyValue(chip.getButton().layoutXProperty(), destinationChip.getImage().getX()),
-                        new KeyValue(chip.getButton().layoutYProperty(), destinationChip.getImage().getY())
-                ));
-        roulette.setBet(Math.max(0, roulette.getBet() - chip.getValue()));
-        roulette.getBettingChips().remove(chip);
-        roulette.getOwningChips().add(chip);
-        roulette.getSpinButton().setVisible(roulette.getBet() > 0);
-        chip.getButton().setDisable(true);
-        transition.setOnFinished(e -> {
-            chip.setSelected(false);
-            chip.getButton().setDisable(false);
-        });
-        transition.play();
+
+        if (destinationChip != null) {
+            Timeline transition = new Timeline(
+                    new KeyFrame(Duration.millis(300),
+                            new KeyValue(chip.getButton().layoutXProperty(), destinationChip.getImage().getLayoutX()),
+                            new KeyValue(chip.getButton().layoutYProperty(), destinationChip.getImage().getLayoutY())
+                    ));
+            game.setBet(Math.max(0, game.getBet() - chip.getValue()));
+            game.getBettingChips().remove(chip);
+            game.getOwningChips().add(chip);
+            game.getSpinButton().setVisible(game.getBet() > 0);
+            removeFieldChip(chip);
+            chip.getButton().setDisable(true);
+            transition.setOnFinished(e -> {
+                chip.setSelected(false);
+                chip.getButton().setDisable(false);
+            });
+            transition.play();
+        }
+        debugBettingState();
+    }
+
+    private void removeFieldChip(Chip chip) {
+        if (game.getBettingFields().isEmpty()) return;
+        for (Field field : new ArrayList<>(game.getBettingFields())) {
+            if (field == null || field.getCoveredChips().isEmpty()) continue;
+            for (Chip nChip : new ArrayList<>(field.getCoveredChips())) {
+                if (nChip.equals(chip)) {
+                    field.getCoveredChips().remove(nChip);
+                    game.getBettingFields().remove(field);
+                    break;
+                }
+            }
+        }
     }
 
     private void placeDragged(Chip chip) {
-        double closest = 9999;
+        double closest = 99999;
         Field closestField = null;
         Vector2 closestFieldPosition = new Vector2();
-        for (Field field : roulette.getLayout().getLayoutFields()) {
+        for (Field field : game.getLayout().getLayoutFields()) {
             Bounds fieldBounds = field.getButton().localToScene(field.getButton().getBoundsInLocal());
             Vector2 fieldPosition = new Vector2(fieldBounds.getMinX() + fieldBounds.getWidth() / 2,
                     fieldBounds.getMinY() + fieldBounds.getHeight() / 2);
@@ -164,42 +208,28 @@ public class RouletteController extends TableGameController {
         if (closest < 50) {
             chip.getButton().setLayoutX(closestFieldPosition.getX() - chip.getButton().getWidth() / 2);
             chip.getButton().setLayoutY(closestFieldPosition.getY() - chip.getButton().getHeight() / 2);
-            roulette.setBettingField(closestField);
-            roulette.getSpinButton().setVisible(true);
-            if (!chip.isSelected()) {
-                roulette.setBet(roulette.getBet() + chip.getValue());
-                roulette.getBettingChips().add(chip);
-                roulette.getOwningChips().remove(chip);
-                chip.setSelected(true);
-            }
-        } else
-            selectingChip(chip);
-    }
 
-    private Transition clearBet() {
-        SequentialTransition sequentialTransition = new SequentialTransition();
-        ArrayList<Chip> removeChips = new ArrayList<>();
-        for (Chip nChip : roulette.getBettingChips()) {
-            if (nChip.getButton() != null) {
-                TranslateTransition moveChip = new TranslateTransition(Duration.millis(1100), nChip.getButton());
-                moveChip.setByY((-100) - nChip.getButton().getLayoutY());
-                sequentialTransition.getChildren().add(moveChip);
-                removeChips.add(nChip);
+            if (!closestField.getCoveredChips().contains(chip)) {
+                closestField.getCoveredChips().add(chip);
+                game.addBettingField(closestField);
+                if (!chip.isSelected()) {
+                    game.setBet(game.getBet() + chip.getValue());
+                    game.getBettingChips().add(chip);
+                    game.getOwningChips().remove(chip);
+                    chip.setSelected(true);
+                }
             }
-        }
-        sequentialTransition.setOnFinished(event -> {
-            for (Chip rChip : removeChips) {
-                roulette.getBettingChips().remove(rChip);
-                roulette.getMainPane().getChildren().remove(rChip.getButton());
-            }
-        });
-        return sequentialTransition;
+            game.getSpinButton().setVisible(true);
+        } else
+            onChipSelected(chip);
+        debugBettingState();
+
     }
 
     public int snapBallToPocket() {
         int closestPocket = -1;
         double closestDistance = 99999;
-        for (Map.Entry<Integer, ImageView> entry : roulette.getWheel().getPockets().entrySet()) {
+        for (Map.Entry<Integer, ImageView> entry : game.getWheel().getPockets().entrySet()) {
             Bounds bounds = entry.getValue().localToScene(entry.getValue().getBoundsInLocal());
             Vector2 pocketPosition = new Vector2(bounds.getCenterX(), bounds.getCenterY());
 
@@ -210,38 +240,65 @@ public class RouletteController extends TableGameController {
             if (distance < closestDistance) {
                 closestPocket = entry.getKey();
                 closestDistance = distance;
-                System.out.println(ballPosition + " ball pos ");
-                System.out.println(pocketPosition + " pocekt pos ");
-
             }
         }
-
-        ball.getImage().setX(roulette.getWheel().getPockets().get(closestPocket).getX());
-        ball.getImage().setY(roulette.getWheel().getPockets().get(closestPocket).getY());
+        System.out.println(closestPocket);
+        ball.getImage().setX(game.getWheel().getPockets().get(closestPocket).getX());
+        ball.getImage().setY(game.getWheel().getPockets().get(closestPocket).getY());
         return closestPocket;
+    }
+
+    private Transition clearBet() {
+        SequentialTransition sequentialTransition = new SequentialTransition();
+        ArrayList<Chip> removeChips = new ArrayList<>();
+        for (Chip nChip : game.getBettingChips()) {
+            if (nChip.getButton() != null) {
+                Timeline transition = new Timeline(
+                        new KeyFrame(Duration.millis(300),
+                                new KeyValue(nChip.getButton().layoutYProperty(), -100)
+                        ));
+                sequentialTransition.getChildren().add(transition);
+                removeChips.add(nChip);
+            }
+        }
+        sequentialTransition.setOnFinished(event -> {
+            for (Chip rChip : removeChips) {
+                game.getBettingChips().remove(rChip);
+                removeFieldChip(rChip);
+                game.getMainPane().getChildren().remove(rChip.getButton());
+            }
+        });
+        return sequentialTransition;
     }
 
     private void checkWinner(int number) {
         boolean win = false;
-        for (int value : roulette.getBettingField().getWinValues()) {
-            if (value == number) {
-                win = true;
-                break;
+        double winningAmount = 0;
+        for (Field field : game.getBettingFields()) {
+            for (int winValue : field.getCoveredNumbers()) {
+                if (winValue == number) {
+                    winningAmount += field.getWinMultiplier();
+                    win = true;
+                    break;
+                }
             }
         }
         if (win) {
-            roulette.setWin(roulette.getBet() * roulette.getBettingField().getWinMultiplier());
-            playerDAO.updateBalance(roulette.getWin());
-            for (Chip chip : new ArrayList<>(roulette.getBettingChips()))
-                selectingChip(chip);
+            game.setWin(game.getBet() * winningAmount);
+            takeWinningChips().play();
+            System.out.println("winner ");
+            for (Chip chip : new ArrayList<>(game.getBettingChips()))
+                onChipSelected(chip);
         } else {
-            roulette.setWin(0);
+            System.out.println("loser");
+            game.setWin(0);
             clearBet().play();
         }
-        PauseTransition pauseTransition = new PauseTransition(Duration.millis(3000));
+        System.out.println(winningAmount + " win amount ");
+        PauseTransition pauseTransition = new PauseTransition(Duration.millis(1500));
         pauseTransition.setOnFinished(event -> {
-            roulette.getWheel().getTable().setVisible(false);
-            roulette.setBet(0);
+            game.getWheel().getTable().setVisible(false);
+            game.setBet(0);
         });
         pauseTransition.play();
     }

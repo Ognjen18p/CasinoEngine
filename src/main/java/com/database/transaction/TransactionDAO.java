@@ -7,14 +7,6 @@ import java.util.Date;
 import java.sql.*;
 
 public class TransactionDAO {
-    private static TransactionDAO instance;
-
-    public static TransactionDAO getInstance() {
-        if (instance == null)
-            instance = new TransactionDAO();
-        return instance;
-    }
-
     private String errorMessage = "";
 
     public String getErrorMessage() {

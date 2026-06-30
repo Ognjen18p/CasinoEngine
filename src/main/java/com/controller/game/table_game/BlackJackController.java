@@ -1,27 +1,26 @@
 package com.controller.game.table_game;
 
+import com.application.configuration.CasinoConfiguration;
 import com.application.configuration.GameSettings;
-import com.basis.game.table_game.TableGame;
+import com.application.utilities.Vector2;
+import com.basis.game.table_game.ChipShop;
 import com.basis.game.table_game.blackjack.BlackJack;
 import com.basis.game.table_game.blackjack.PlayingCard;
-import com.basis.game.table_game.blackjack.Chip;
-import com.basis.game.table_game.ChipShop;
-import com.controller.page.CashierPageController;
-import com.controller.page.MenuPageController;
+import com.basis.game.table_game.Chip;
 import com.stylization.game.BlackJackStylization;
 import javafx.animation.*;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 import com.application.GameManager;
 
 import java.util.ArrayList;
 
-public class BlackJackController extends TableGameController {
-    private BlackJack blackJack;
-    private ChipShop chipShop;
+
+public class BlackJackController extends TableGameController<BlackJack> {
 
     public BlackJackController() {
         super();
@@ -32,13 +31,12 @@ public class BlackJackController extends TableGameController {
 
     @Override
     protected void setupEventHandlers() {
-        handleExit(blackJack);
-        handleDeposit(blackJack);
+        handleExit(game);
+        handleDeposit(game);
         handleDeal();
         handleHit();
         handleStand();
-        handleChipShop();
-        purchasedChip(blackJack);
+        purchasedChipsListener();
     }
 
     @Override
@@ -48,196 +46,206 @@ public class BlackJackController extends TableGameController {
     }
 
     @Override
-    protected void initializeScene() {
-        blackJack = new BlackJack();
-
-        chipShop = new ChipShop(blackJack);
-
-        scene = new Scene(blackJack.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
-
-        BlackJackStylization blackJackStylization = new BlackJackStylization(blackJack);
+    public void onReset() {
+        game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
     }
 
     @Override
-    protected void purchasedChip(TableGame game) {
+    protected void initializeScene() {
+        game = new BlackJack();
+
+        chipShop = new ChipShop(game, playerDAO, new Vector2(600, 80), new Vector2(100, 300));
+
+        scene = new Scene(game.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
+
+        new BlackJackStylization(game);
+    }
+
+    @Override
+    protected void purchasedChipsListener() {
         game.getOwningChips().addListener((ListChangeListener<Chip>) chips -> {
             while (chips.next()) {
                 if (chips.wasAdded()) {
-                    for (Chip chip : chips.getAddedSubList()) {
-                        if (chip.getButton() != null)
-                            chip.getButton().setOnAction(actionEvent -> selectingChip(chip));
+                    for (Chip addedChip : chips.getAddedSubList()) {
+                        if (addedChip.getButton() != null)
+                            addedChip.getButton().setOnMouseClicked(actionEvent -> {
+                                if (actionEvent.getButton() == MouseButton.SECONDARY) {
+                                    chipShop.sellChipTransition(addedChip);
+                                } else {
+                                    onChipSelected(addedChip);
+                                }
+                            });
                     }
                 }
             }
         });
+        game.addOwningChips();
     }
 
     @Override
-    protected void selectingChip(Chip chip) {
-        TranslateTransition moveChip = new TranslateTransition(Duration.millis(1200), chip.getButton());
+    protected void onChipSelected(Chip chip) {
+        Timeline moveChipTransition = new Timeline();
         chip.getButton().toFront();
-
         if (chip.isSelected()) {
-            for (Chip nChip : blackJack.getOwningChips()) {
-                if (nChip.getValue() == chip.getValue()) {
-                    blackJack.setBet(blackJack.getBet() - chip.getValue());
-                    moveChip.setToY(nChip.getImage().getY() - chip.getButton().getLayoutY());
-                    moveChip.setToX(nChip.getImage().getX() - chip.getButton().getLayoutX());
-                    if (blackJack.getBet() <= 0) {
-                        blackJack.setBet(0);
-                        blackJack.getPlaceYourBetsLabel().setVisible(true);
-                        blackJack.getDealButton().setVisible(false);
+            for (Chip owningChip : game.getOwningChips()) {
+                if (owningChip.getValue() == chip.getValue()) {
+                    moveChipTransition.getKeyFrames().setAll(
+                            new KeyFrame(Duration.millis(300),
+                                    new KeyValue(chip.getButton().layoutXProperty(), owningChip.getImage().getLayoutX()),
+                                    new KeyValue(chip.getButton().layoutYProperty(), owningChip.getImage().getLayoutY())
+                            )
+                    );
+                    game.setBet(Math.max(0, game.getBet() - chip.getValue()));
+                    if (game.getBet() < CasinoConfiguration.MIN_BET) {
+                        game.getPlaceYourBetsLabel().setVisible(true);
+                        game.getDealButton().setVisible(false);
                     }
                     break;
                 }
             }
             chip.getButton().setDisable(true);
-            blackJack.getBettingChips().remove(chip);
-            blackJack.getOwningChips().add(chip);
+            game.getBettingChips().remove(chip);
+            game.getOwningChips().add(chip);
         } else {
-            blackJack.getPlaceYourBetsLabel().setVisible(false);
-            blackJack.getDealButton().setVisible(true);
-            blackJack.setBet(blackJack.getBet() + chip.getValue());
-            moveChip.setToY(blackJack.getBettingChips().getFirst().getImage().getY() - chip.getButton().getLayoutY());
-            moveChip.setToX(blackJack.getBettingChips().getFirst().getImage().getX() - chip.getButton().getLayoutX());
+            moveChipTransition.getKeyFrames().setAll(
+                    new KeyFrame(Duration.millis(300),
+                            new KeyValue(chip.getButton().layoutXProperty(), game.getBettingChips().getFirst().getImage().getLayoutX()),
+                            new KeyValue(chip.getButton().layoutYProperty(), game.getBettingChips().getFirst().getImage().getLayoutY())
+                    )
+            );
             chip.getButton().setDisable(true);
-            blackJack.getOwningChips().remove(chip);
-            blackJack.getBettingChips().add(chip);
+            game.setBet(Math.min(game.getBet() + chip.getValue(), CasinoConfiguration.MAX_BET));
+            game.getOwningChips().remove(chip);
+            game.getBettingChips().add(chip);
+            if (game.getBet() >= CasinoConfiguration.MIN_BET && !game.getDealButton().isVisible()) {
+                game.getPlaceYourBetsLabel().setVisible(false);
+                game.getDealButton().setVisible(true);
+            }
         }
-        moveChip.setOnFinished(event -> {
+        moveChipTransition.setOnFinished(event -> {
             chip.setSelected(!chip.isSelected());
             chip.getButton().setDisable(false);
         });
-        moveChip.play();
+        moveChipTransition.play();
     }
 
-
     private void handleDeal() {
-        blackJack.getDealButton().setOnAction(actionEvent -> {
-            blackJack.getDealButton().setVisible(false);
+        game.getDealButton().setOnAction(actionEvent -> {
+            game.getDealButton().setVisible(false);
             deal();
         });
     }
 
     private void handleHit() {
-        blackJack.getHitButton().setOnAction(actionEvent -> {
-            blackJack.buttonsHitStandActivation(false);
+        game.getHitButton().setOnAction(actionEvent -> {
+            game.buttonsHitStandActivation(false);
             hit();
         });
     }
 
     private void handleStand() {
-        blackJack.getStandButton().setOnAction(actionEvent -> {
-            blackJack.buttonsHitStandActivation(false);
+        game.getStandButton().setOnAction(actionEvent -> {
+            game.buttonsHitStandActivation(false);
             stand();
         });
     }
 
-    private void handleChipShop() {
-        blackJack.getChipShopButton().setOnAction(actionEvent ->
-                chipShop.getMainPane().setVisible(!chipShop.getMainPane().isVisible()));
-    }
-
-    private enum Puller {PLAYER, DEALER}
-
-    private Transition pullCard(boolean flipped, Puller puller, PlayingCard card, PlayingCard destination) {
-        destination.setRank(card.getRank());
-        destination.setSuit(card.getSuit());
+    private Transition pullCard(boolean flipped, boolean isPlayer, PlayingCard pulledCard, PlayingCard destinationCard) {
+        destinationCard.setRank(pulledCard.getRank());
+        destinationCard.setSuit(pulledCard.getSuit());
 
         if (flipped) {
-            Image savedImage = card.getImage().getImage();
-            card.getImage().setImage(blackJack.getDealersFlippedCard().getImage().getImage());
-            blackJack.getDealersFlippedCard().getImage().setImage(savedImage);
-            blackJack.getDealerCards().add(card);
-            blackJack.addScoreDealer(card);
-        } else if (puller == Puller.PLAYER) {
-            blackJack.getPlayerCards().add(card);
-            blackJack.addScorePlayer(card);
+            Image savedImage = pulledCard.getImage().getImage();
+            pulledCard.getImage().setImage(game.getDealersFlippedCard().getImage().getImage());
+            game.getDealersFlippedCard().getImage().setImage(savedImage);
+            game.getDealerCards().add(pulledCard);
+            game.addScoreDealer(pulledCard);
+        } else if (isPlayer) {
+            game.getPlayerCards().add(pulledCard);
+            game.addScorePlayer(pulledCard);
         } else {
-            blackJack.getDealerCards().add(card);
-            blackJack.addScoreDealer(card);
+            game.getDealerCards().add(pulledCard);
+            game.addScoreDealer(pulledCard);
         }
 
-        TranslateTransition moveCard = new TranslateTransition(Duration.millis(1200), card.getImage());
-        card.getImage().toFront();
-        card.getImage().setTranslateX(0);
-        card.getImage().setTranslateY(0);
-        moveCard.setToX(destination.getImage().getX() - card.getImage().getX());
-        moveCard.setToY(destination.getImage().getY() - card.getImage().getY());
+        Timeline moveCardTransition = new Timeline(
+                new KeyFrame(Duration.millis(400),
+                        new KeyValue(pulledCard.getImage().layoutYProperty(), destinationCard.getImage().getLayoutY()),
+                        new KeyValue(pulledCard.getImage().layoutXProperty(), destinationCard.getImage().getLayoutX()),
+                        new KeyValue(pulledCard.getImage().rotateProperty(), 0)
+                )
+        );
+        pulledCard.getImage().toFront();
 
-        RotateTransition rotateCard = new RotateTransition(Duration.millis(600), card.getImage());
-        rotateCard.setByAngle(-20);
-
-        return new ParallelTransition(moveCard, rotateCard);
+        return new ParallelTransition(moveCardTransition);
     }
 
     private void deal() {
-        playerDAO.updateBalance(-blackJack.getBet());
         SequentialTransition sequentialTransition = new SequentialTransition();
         sequentialTransition.getChildren().addAll(
-                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot())),
-                pullCard(true, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get( blackJack.getAndIncrementDealerSlot())),
-                pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot())),
-                pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(blackJack.getAndIncrementDealerSlot())));
+                pullCard(false, true, game.getDeck().drawCard(), game.getPlayerSlots().get(game.getAndIncrementPlayerSlot())),
+                pullCard(true, false, game.getDeck().drawCard(), game.getDealerSlots().get(game.getAndIncrementDealerSlot())),
+                pullCard(false, true, game.getDeck().drawCard(), game.getPlayerSlots().get(game.getAndIncrementPlayerSlot())),
+                pullCard(false, false, game.getDeck().drawCard(), game.getDealerSlots().get(game.getAndIncrementDealerSlot())));
         sequentialTransition.setOnFinished(event -> {
-            if (blackJack.getPlayerScore() == blackJack.getBLACKJACK()) {
-                blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_BLACKJACK);
-                Transition revealFlipped = revealFlipped();
+            if (game.getPlayerScore() == BlackJack.BLACKJACK) {
+                game.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_BLACKJACK);
+                Transition revealFlipped = revealFlippedTransition();
                 revealFlipped.setOnFinished(actionEvent -> {
-                    if (blackJack.getDealerScore() == blackJack.getBLACKJACK())
-                        blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
+                    if (game.getDealerScore() == BlackJack.BLACKJACK)
+                        game.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
                     checkWinner();
                 });
                 revealFlipped.play();
-            } else if (blackJack.getDealerScore() == blackJack.getBLACKJACK()) {
-                blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_BLACKJACK);
-                Transition revealFlipped = revealFlipped();
+            } else if (game.getDealerScore() == BlackJack.BLACKJACK) {
+                game.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_BLACKJACK);
+                Transition revealFlipped = revealFlippedTransition();
                 revealFlipped.setOnFinished(actionEvent -> checkWinner());
                 revealFlipped.play();
             } else
-                blackJack.buttonsHitStandActivation(true);
+                game.buttonsHitStandActivation(true);
         });
         sequentialTransition.play();
     }
 
     private void hit() {
-        if (blackJack.getPlayerScore() < blackJack.getBLACKJACK()) {
-            Transition pullCard = pullCard(false, Puller.PLAYER, blackJack.getDeck().drawCard(), blackJack.getPlayerSlots().get(blackJack.getAndIncrementPlayerSlot()));
+        game.buttonsHitStandActivation(false);
+        if (game.getPlayerScore() <= BlackJack.BLACKJACK) {
+            Transition pullCard = pullCard(false, true, game.getDeck().drawCard(), game.getPlayerSlots().get(game.getAndIncrementPlayerSlot()));
             pullCard.setOnFinished(event -> {
-                if (blackJack.getPlayerScore() > blackJack.getBLACKJACK()) {
-                    Transition revealFlipped = revealFlipped();
+                if (game.getPlayerScore() > BlackJack.BLACKJACK) {
+                    Transition revealFlipped = revealFlippedTransition();
                     revealFlipped.setOnFinished(actionEvent -> {
-                        blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
+                        game.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
                         checkWinner();
                     });
                     revealFlipped.play();
-                }
-                blackJack.buttonsHitStandActivation(true);
+                } else game.buttonsHitStandActivation(true);
             });
             pullCard.play();
         }
     }
 
-    private Transition revealFlipped() {
+    private Transition revealFlippedTransition() {
         SequentialTransition sequentialTransition = new SequentialTransition();
         ParallelTransition parallelTransition = new ParallelTransition();
-        PauseTransition pauseTransition = new PauseTransition(Duration.millis(1200));
+        PauseTransition pauseTransition = new PauseTransition(Duration.millis(500));
 
-        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(1200), blackJack.getDealerCards().getFirst().getImage());
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(500), game.getDealerCards().getFirst().getImage());
         scaleDown.setToX(0);
         scaleDown.setOnFinished(event -> {
-            blackJack.getDealerCards().getFirst().getImage().setImage(blackJack.getDealersFlippedCard().getImage().getImage());
+            game.getDealerCards().getFirst().getImage().setImage(game.getDealersFlippedCard().getImage().getImage());
         });
 
-        RotateTransition flip = new RotateTransition(Duration.millis(0), blackJack.getDealerCards().getFirst().getImage());
+        RotateTransition flip = new RotateTransition(Duration.millis(0), game.getDealerCards().getFirst().getImage());
         flip.setAxis(Rotate.Y_AXIS);
         flip.setByAngle(180);
         flip.setAutoReverse(true);
 
-        ScaleTransition scaleBack = new ScaleTransition(Duration.millis(1200), blackJack.getDealerCards().getFirst().getImage());
+        ScaleTransition scaleBack = new ScaleTransition(Duration.millis(500), game.getDealerCards().getFirst().getImage());
         scaleBack.setToX(1);
 
-        RotateTransition rotate = new RotateTransition(Duration.millis(1200), blackJack.getDealerCards().getFirst().getImage());
+        RotateTransition rotate = new RotateTransition(Duration.millis(500), game.getDealerCards().getFirst().getImage());
         rotate.setAxis(Rotate.Y_AXIS);
         rotate.setByAngle(180);
         rotate.setAutoReverse(true);
@@ -248,173 +256,117 @@ public class BlackJackController extends TableGameController {
     }
 
     private void dealerPullCard() {
-        if (blackJack.getDealerScore() <= 16) {
-            Transition pullCard = pullCard(false, Puller.DEALER, blackJack.getDeck().drawCard(), blackJack.getDealerSlots().get(blackJack.getAndIncrementDealerSlot()));
+        if (game.getDealerScore() <= 16) {
+            Transition pullCard = pullCard(false, false, game.getDeck().drawCard(), game.getDealerSlots().get(game.getAndIncrementDealerSlot()));
             pullCard.setOnFinished(event -> {
                 dealerPullCard();
             });
             pullCard.play();
-        } else if (blackJack.getDealerScore() == blackJack.getPlayerScore()) {
-            blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
+        } else if (game.getDealerScore() == game.getPlayerScore()) {
+            game.setBlackJackWinState(BlackJack.BlackJackWinState.PUSH);
             checkWinner();
-        } else if (blackJack.getDealerScore() < blackJack.getPlayerScore() || blackJack.getDealerScore() > blackJack.getBLACKJACK()) {
-            blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_WINS);
+        } else if (game.getDealerScore() < game.getPlayerScore() || game.getDealerScore() > BlackJack.BLACKJACK) {
+            game.setBlackJackWinState(BlackJack.BlackJackWinState.PLAYER_WINS);
             checkWinner();
         } else {
-            blackJack.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
+            game.setBlackJackWinState(BlackJack.BlackJackWinState.DEALER_WINS);
             checkWinner();
         }
     }
 
     private void stand() {
-        Transition revealFlipped = revealFlipped();
+        game.buttonsHitStandActivation(false);
+        Transition revealFlipped = revealFlippedTransition();
         revealFlipped.setOnFinished(event -> dealerPullCard());
         revealFlipped.play();
     }
 
     private void checkWinner() {
-        if (blackJack.getBlackJackWinState() != BlackJack.BlackJackWinState.IN_PROGRESS) {
-            blackJack.buttonsHitStandActivation(false);
+        if (game.getBlackJackWinState() != BlackJack.BlackJackWinState.IN_PROGRESS) {
             PauseTransition pauseTransition = new PauseTransition();
-            pauseTransition.setDuration(Duration.millis(1100));
+            pauseTransition.setDuration(Duration.millis(600));
             pauseTransition.setOnFinished(event -> {
-                System.out.println("Winner: " + blackJack.getBlackJackWinState().toString());
+                System.out.println("Winner: " + game.getBlackJackWinState().toString());
                 SequentialTransition transition = new SequentialTransition();
-                switch (blackJack.getBlackJackWinState()) {
+                switch (game.getBlackJackWinState()) {
                     case PUSH:
-                        transition.getChildren().addAll(resetBet(), removeCards());
+                        transition.getChildren().add(returnBettingChips());
                         System.out.println("PUSH");
                         break;
                     case PLAYER_WINS:
-                        transition.getChildren().addAll(takeBet(), removeCards());
+                        game.setWin(game.getBet() * 2);
+                        transition.getChildren().addAll(takeWinningChips(), returnBettingChips());
                         break;
                     case PLAYER_BLACKJACK:
-                        transition.getChildren().addAll(takeBet(), removeCards());
+                        game.setWin((int) (game.getBet() * 2.5));
+                        transition.getChildren().addAll(takeWinningChips(), returnBettingChips());
                         System.out.println("PLAYER BLACKJACK");
                         break;
                     case DEALER_WINS:
-                        transition.getChildren().addAll(clearBet(), removeCards());
+                        transition.getChildren().add(clearBet());
                         System.out.println("DEALER win");
                         break;
                     case DEALER_BLACKJACK:
-                        transition.getChildren().addAll(clearBet(), removeCards());
+                        transition.getChildren().addAll(clearBet());
                         System.out.println("DEALER BLACKJACK");
                         break;
                     default:
                         return;
                 }
+                transition.getChildren().add(removeCards());
                 transition.play();
             });
             pauseTransition.play();
         }
     }
 
-    private Transition resetBet() {
-        SequentialTransition sequentialTransition = new SequentialTransition();
-        ArrayList<Chip> resetChips = new ArrayList<>();
-        for (Chip bChip : blackJack.getBettingChips()) {
-            if (bChip.getButton() != null && bChip.isSelected()) {
-                for (Chip oChip : blackJack.getOwningChips()) {
-                    if (oChip.getValue() == bChip.getValue()) {
-                        TranslateTransition moveChip = new TranslateTransition(Duration.millis(1100), bChip.getButton());
-                        bChip.getButton().setTranslateX(0);
-                        bChip.getButton().setTranslateY(0);
-                        moveChip.setByY(oChip.getImage().getY() - bChip.getButton().getLayoutY());
-                        moveChip.setByX(oChip.getImage().getX() - bChip.getButton().getLayoutX());
-                        sequentialTransition.getChildren().add(moveChip);
-                        resetChips.add(bChip);
-                    }
-                }
-            }
-        }
-        sequentialTransition.setOnFinished(event -> {
-            for (Chip aChip : resetChips) {
-                blackJack.getBettingChips().remove(aChip);
-                blackJack.getOwningChips().add(aChip);
-            }
-            blackJack.setWin(0);
-        });
-        return sequentialTransition;
-    }
-
-    private Transition takeBet() {
-        SequentialTransition sequentialTransition = new SequentialTransition();
-        ArrayList<Chip> addChips = new ArrayList<>();
-        for (Chip bChip : blackJack.getBettingChips()) {
-            if (bChip.isSelected()) {
-                for (Chip oChip : blackJack.getOwningChips()) {
-                    if (oChip.getValue() == bChip.getValue()) {
-                        TranslateTransition moveChip = new TranslateTransition(Duration.millis(1100), bChip.getButton());
-                        bChip.getButton().setTranslateX(0);
-                        bChip.getButton().setTranslateY(0);
-                        moveChip.setByY(oChip.getImage().getY() - bChip.getButton().getLayoutY());
-                        moveChip.setByX(oChip.getImage().getX() - bChip.getButton().getLayoutX());
-                        sequentialTransition.getChildren().add(moveChip);
-                        addChips.add(bChip);
-                    }
-                }
-            }
-        }
-        sequentialTransition.setOnFinished(event -> {
-            int addBalance = (blackJack.getBet() * 2);
-            for (Chip aChip : addChips) {
-                if (blackJack.getBlackJackWinState() == BlackJack.BlackJackWinState.PLAYER_BLACKJACK)
-                    addBalance = (int)(addBalance * 1.5);
-
-                blackJack.setWin(addBalance);
-                blackJack.setLastWin(addBalance);
-                blackJack.setTotalWin(blackJack.getTotalWin() + addBalance);
-
-                playerDAO.updateBalance(addBalance);
-
-                aChip.setSelected(false);
-                blackJack.getBettingChips().remove(aChip);
-                blackJack.getOwningChips().add(aChip);
-            }
-        });
-        return sequentialTransition;
-    }
-
     private Transition clearBet() {
         SequentialTransition sequentialTransition = new SequentialTransition();
         ArrayList<Chip> removeChips = new ArrayList<>();
-        for (Chip nChip : blackJack.getBettingChips()) {
+        for (Chip nChip : game.getBettingChips()) {
             if (nChip.getButton() != null) {
-                TranslateTransition moveChip = new TranslateTransition(Duration.millis(1100), nChip.getButton());
-                moveChip.setByY((-100) - nChip.getButton().getLayoutY());
-                sequentialTransition.getChildren().add(moveChip);
+                TranslateTransition moveChipTransition = new TranslateTransition(Duration.millis(400), nChip.getButton());
+                moveChipTransition.setByY((-100) - nChip.getButton().getLayoutY());
+                sequentialTransition.getChildren().add(moveChipTransition);
                 removeChips.add(nChip);
             }
         }
         sequentialTransition.setOnFinished(event -> {
             for (Chip rChip : removeChips) {
-                blackJack.getBettingChips().remove(rChip);
-                blackJack.getMainPane().getChildren().remove(rChip.getButton());
-                blackJack.setWin(0);
+                GameManager.getInstance().getCurrentPlayer().removeFromOwningChips(rChip.getValue());
+                if (!playerDAO.saleChip())
+                    System.out.println(playerDAO.getErrorMessage());
+                game.getBettingChips().remove(rChip);
+                game.getMainPane().getChildren().remove(rChip.getButton());
+                game.setWin(0);
             }
         });
         return sequentialTransition;
     }
 
     private Transition removeCards() {
-        SequentialTransition parallelTransition = new SequentialTransition();
-        for (PlayingCard nCard : blackJack.getPlayerCards()) {
-            TranslateTransition moveCard = new TranslateTransition(Duration.millis(1100), nCard.getImage());
-            moveCard.setByY(-400 - nCard.getImage().getY());
-            parallelTransition.getChildren().add(moveCard);
+        ParallelTransition parallelTransition = new ParallelTransition();
+        for (PlayingCard playerCard : game.getPlayerCards()) {
+            Timeline moveCardAnimation = new Timeline(
+                    new KeyFrame(Duration.millis(400),
+                            new KeyValue(playerCard.getImage().layoutYProperty(), -100))
+            );
+            parallelTransition.getChildren().add(moveCardAnimation);
         }
-        for (PlayingCard nCard : blackJack.getDealerCards()) {
-            TranslateTransition moveCard = new TranslateTransition(Duration.millis(1100), nCard.getImage());
-            moveCard.setByY(-400 - nCard.getImage().getY());
-            parallelTransition.getChildren().add(moveCard);
+        for (PlayingCard dealerCard : game.getDealerCards()) {
+            Timeline moveCardAnimation = new Timeline(
+                    new KeyFrame(Duration.millis(400),
+                            new KeyValue(dealerCard.getImage().layoutYProperty(), -100))
+            );
+            parallelTransition.getChildren().add(moveCardAnimation);
         }
         parallelTransition.setOnFinished(event -> {
-            blackJack.getDeck().getCards().forEach(card -> {
-                blackJack.getMainPane().getChildren().remove(card.getImage());
+            game.getDeck().getCards().forEach(pulledCard -> {
+                game.getMainPane().getChildren().remove(pulledCard.getImage());
             });
-            blackJack.getPlayerCards().clear();
-            blackJack.getDealerCards().clear();
-            blackJack.reset();
+            game.getPlayerCards().clear();
+            game.getDealerCards().clear();
+            game.reset();
         });
         return parallelTransition;
     }

@@ -71,7 +71,6 @@ public class RouletteStylization {
                 "-fx-background-color: linear-gradient(to bottom, " + GOLD_DARK + ", #e67e00);";
 
         styleActionButton(roulette.getSpinButton(), 120, 45, base, hover);
-        styleActionButton(roulette.getChipShopButton(), 110, 38, base, hover);
         styleActionButton(roulette.getDepositButton(), 90, 38, base, hover);
         styleActionButton(roulette.getExitButton(), 70, 38, base, hover);
     }
@@ -95,7 +94,7 @@ public class RouletteStylization {
 
                 case NUMBER -> {
                     boolean isRed = Field.RED_NUMBERS.contains(
-                            field.getWinValues().isEmpty() ? -1 : field.getWinValues().getFirst());
+                            field.getCoveredNumbers().isEmpty() ? -1 : field.getCoveredNumbers().getFirst());
                     String bg = isRed ? RED_FIELD : BLACK_FIELD;
                     String bgH = isRed ? RED_HOVER : BLACK_HOVER;
                     styleFieldButton(btn, bg, bgH,

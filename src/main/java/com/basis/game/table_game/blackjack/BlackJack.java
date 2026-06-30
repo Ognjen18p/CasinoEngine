@@ -1,6 +1,8 @@
 package com.basis.game.table_game.blackjack;
 
 import com.application.GameManager;
+import com.basis.game.table_game.Chip;
+import com.basis.game.table_game.ChipShop;
 import com.basis.game.table_game.TableGame;
 import com.application.utilities.Vector2;
 import javafx.collections.FXCollections;
@@ -29,7 +31,8 @@ public class BlackJack extends TableGame {
     private BlackJackWinState blackJackWinState = BlackJackWinState.IN_PROGRESS;
     private BlackJackPhaseState blackJackPhaseState = BlackJackPhaseState.DEAL;
 
-    private final int BLACKJACK = 21;
+    public static final int BLACKJACK = 21;
+
     private int playerScore = 0;
     private int dealerScore = 0;
     private int playerFreeSlot;
@@ -79,13 +82,8 @@ public class BlackJack extends TableGame {
         return blackJackWinState;
     }
 
-    public int getBLACKJACK() {
-        return BLACKJACK;
-    }
-
     public void setBlackJackWinState(BlackJackWinState blackJackWinState) {
         this.blackJackWinState = blackJackWinState;
-
     }
 
     public BlackJackPhaseState getBlackJackPhaseState() {
@@ -160,10 +158,6 @@ public class BlackJack extends TableGame {
         return dealerCards;
     }
 
-    public Button getChipShopButton() {
-        return chipShopButton;
-    }
-
     @Override
     public void initializeElements() {
         super.initializeElements();
@@ -172,12 +166,9 @@ public class BlackJack extends TableGame {
         playerCards = new ArrayList<>();
         dealerCards = new ArrayList<>();
 
-        owningChips = FXCollections.observableArrayList();
         bettingChips = new ArrayList<>();
-
-        bettingChips.add(new Chip(0, 100, 100, false));
-        fillChipSlots(80, 100, 400);
-
+        bettingChips.add(new Chip(0, 50));
+        fillOwningChips(100, 200, 400);
         playerFreeSlot = 0;
         dealerFreeSlot = 0;
 
@@ -221,10 +212,6 @@ public class BlackJack extends TableGame {
         exitButton.setTranslateY(50);
         exitButton.setPrefWidth(200);
 
-        chipShopButton = new Button("Chip Shop");
-        chipShopButton.setTranslateX(800);
-        chipShopButton.setTranslateY(50);
-
         dealButton = new Button("Deal");
         dealButton.setTranslateX(300);
         dealButton.setTranslateY(500);
@@ -244,12 +231,10 @@ public class BlackJack extends TableGame {
         deck = new Deck(new Vector2(900, 100));
         deck.fill();
 
-        dealersFlippedPlayingCard = new PlayingCard(new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
+        dealersFlippedPlayingCard = new PlayingCard(new ImageView(new Image(getClass().getResource("/images/TableGames/BlackJackImages/Cards/Flipped.png").toExternalForm())), null, null, -100, -100);
 
-        mainPane.getChildren().addAll(depositButton, chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
-                dealButton, hitButton, standButton,exitButton, bettingChips.getFirst().getImage());
-
-        blackJackPhaseState = BlackJackPhaseState.DEAL;
+        mainPane.getChildren().addAll(depositButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, betLabel, placeYourBetsLabel, playerScoreLabel, dealerScoreLabel,
+                dealButton, hitButton, standButton, exitButton, bettingChips.getFirst().getImage());
 
         fillCardSlots();
         addCards();
@@ -274,7 +259,7 @@ public class BlackJack extends TableGame {
         }
     }
 
-    public void addCards(){
+    public void addCards() {
         deck.getCards().forEach((card) -> {
             mainPane.getChildren().add(card.getImage());
         });
@@ -324,13 +309,14 @@ public class BlackJack extends TableGame {
         setDealerScore(0);
 
         lastBet = bet;
-        bet = 0;
+        setBet(0);
 
-        dealersFlippedPlayingCard.getImage().setImage(new Image(getClass().getResource("/images/BlackJackImages/Cards/Flipped.png").toExternalForm()));
+        dealersFlippedPlayingCard.getImage().setImage(new Image(getClass().getResource("/images/TableGames/BlackJackImages/Cards/Flipped.png").toExternalForm()));
 
         dealerFreeSlot = 0;
         playerFreeSlot = 0;
 
+        placeYourBetsLabel.setVisible(true);
         dealButton.setVisible(false);
         standButton.setVisible(false);
         hitButton.setVisible(false);

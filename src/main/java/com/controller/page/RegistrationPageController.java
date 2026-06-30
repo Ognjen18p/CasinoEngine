@@ -93,7 +93,7 @@ public class RegistrationPageController extends Controller {
             return;
         }
 
-        Player newPlayer = new Player(0, name, lastname, email, username, password, new Date(), 0.0f, 0);
+        Player newPlayer = new Player(0, name, lastname, email, username, password, new Date(), 0.0f, 0, null);
         EmailService.getInstance().sendVerificationEmail(email, VerificatonService.getInstance().generateToken(email));
         registrationPage.getVerificationStage().show();
 
@@ -118,7 +118,7 @@ public class RegistrationPageController extends Controller {
             }
             registrationPage.getVerificationStage().close();
             GameManager.getInstance().setCurrentPlayer(newPlayer);
-            GameManager.getInstance().setCurrentController(new LoginPageController());
+            GameManager.getInstance().navigateTo(new LoginPageController());
         });
     }
 
@@ -138,7 +138,7 @@ public class RegistrationPageController extends Controller {
     }
 
     private void handleBackToLogin() {
-        GameManager.getInstance().setCurrentController(new LoginPageController());
+        GameManager.getInstance().navigateTo(new LoginPageController());
     }
 
 }

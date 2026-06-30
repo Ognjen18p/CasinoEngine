@@ -77,7 +77,7 @@ public class Layout {
             ArrayList<Field> connected = new ArrayList<>();
             for (int n = nDozen * 12 + 1; n <= 12 * (nDozen + 1); n++) {
                 for (Field numberField : numberFields) {
-                    if (numberField.getWinValues().getFirst() == n) {
+                    if (numberField.getCoveredNumbers().getFirst() == n) {
                         connected.add(numberField);
                     }
                 }
@@ -130,7 +130,7 @@ public class Layout {
         ArrayList<Field> connected = new ArrayList<>();
         for (int n = from; n < to; n += increment) {
             for (Field numberField : numberFields) {
-                if (numberField.getWinValues().getFirst() == n)
+                if (numberField.getCoveredNumbers().getFirst() == n)
                     connected.add(numberField);
             }
         }
@@ -141,7 +141,7 @@ public class Layout {
         ArrayList<Field> connected = new ArrayList<>();
         for (int n : in) {
             for (Field numberField : numberFields) {
-                if (numberField.getWinValues().getFirst() == n)
+                if (numberField.getCoveredNumbers().getFirst() == n)
                     connected.add(numberField);
             }
         }

@@ -14,19 +14,18 @@ public class CardValidator {
 
     public boolean isNameValid(String name) {
         if (name.length() < 2) {
-            errorMessage = "Invalid name";
+            errorMessage = "Must be at least 2 characters long";
             return false;
         }
         return true;
     }
 
     public boolean isNumberValid(String cardNumber) {
-        if (cardNumber == null || cardNumber.isEmpty()) {
-            errorMessage = "The card number is empty";
+        if (cardNumber.isEmpty()) {
+            errorMessage = "Enter the card number";
             return false;
         }
-        String trimmedCardNumber = cardNumber.trim();
-        if (!trimmedCardNumber.matches("\\d{16}")) {
+        if (!cardNumber.trim().matches("\\d{16}")) {
             errorMessage = "Invalid card number";
             return false;
         }
@@ -34,7 +33,7 @@ public class CardValidator {
     }
 
     public boolean isCvvValid(String cvv) {
-        if (cvv == null || cvv.isEmpty()) {
+        if (cvv.isEmpty()) {
             errorMessage = "The cvv is empty";
             return false;
         }

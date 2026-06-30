@@ -1,5 +1,6 @@
 package com.controller.game.machine_game;
 
+import com.application.configuration.CasinoConfiguration;
 import com.application.configuration.GameSettings;
 import com.application.utilities.Vector2;
 import com.basis.game.Game;
@@ -16,60 +17,77 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import com.application.GameManager;
 
-public class SlotController extends GameController {
-    private Slot slot;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SlotController extends GameController<Slot> {
 
     public SlotController() {
         super();
         initializeScene();
         setupEventHandlers();
+
+//        int spins = 100_000;
+//        game.setBet(1);
+//        double win = 0;
+//        for (int i = 0; i < spins; i++) {
+//            for (Reel reel : game.getReels())
+//                reel.replacement();
+//            win += checkWinner();
+//        }
+//        System.out.println(" end: " + win / spins);
     }
 
     @Override
     protected void setupEventHandlers() {
-        handleExit(slot);
-        handleDeposit(slot);
+        handleExit(game);
+        handleDeposit(game);
         handleSpin();
         handleBetting();
     }
 
     @Override
     protected void initializeScene() {
-        slot = new Slot(new Vector2(5, 3), 10, 1000);
+        game = new Slot(new Vector2(5, 3));
 
-        new SlotStylization(slot);
+        new SlotStylization(game);
 
-        scene = new Scene(slot.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
+        scene = new Scene(game.getMainPane(), GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
     }
 
     @Override
     public void showScene() {
         GameManager.getInstance().setMainScene(scene);
-        GameManager.getInstance().getMainStage().setTitle("SLOT");
+        GameManager.getInstance().getMainStage().setTitle("Slot");
+    }
+
+    @Override
+    public void onReset() {
+        game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
     }
 
     private void handleBetting() {
-        slot.getAddBetButton().setOnAction(event -> {
-            slot.setBet(Math.min(slot.getMaximumBet(), slot.getBet() + 10));
-            slot.getSpinButton().setDisable(slot.getBet() < slot.getMinimumBet());
+        game.getAddBetButton().setOnAction(event -> {
+            game.setBet(Math.min(CasinoConfiguration.MAX_BET, game.getBet() + 10));
+            game.getSpinButton().setDisable(game.getBet() < CasinoConfiguration.MIN_BET);
         });
-        slot.getRemoveBetButton().setOnAction(event -> {
-            slot.setBet(Math.max(slot.getMinimumBet(), slot.getBet() - 10));
+        game.getRemoveBetButton().setOnAction(event -> {
+            game.setBet(Math.max(CasinoConfiguration.MIN_BET, game.getBet() - 10));
         });
     }
 
     private void handleSpin() {
-        slot.getSpinButton().setOnAction(event -> {
-            if (slot.getBet() > slot.getMinimumBet()) {
-                playerDAO.updateBalance(-slot.getBet());
+        game.getSpinButton().setOnAction(event -> {
+            if (game.getBet() >= CasinoConfiguration.MIN_BET) {
+                playerDAO.updateBalance(-game.getBet());
                 transactionDAO.createTransaction(
                         new Transaction(0, GameManager.getInstance().getCurrentPlayer().getId(),
-                        slot.getBet(), Transaction.Status.APPROVED, Transaction.Type.BET)
+                                game.getBet(), Transaction.Status.APPROVED, Transaction.Type.BET)
                 );
-                slot.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
-                for (Reel reel : slot.getReels())
+                game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
+                for (Reel reel : game.getReels())
                     reel.replacement();
-                slot.getSpinButton().setDisable(true);
+                game.getSpinButton().setDisable(true);
                 spin();
             }
 
@@ -82,8 +100,9 @@ public class SlotController extends GameController {
             long startTime = 0;
             double velocity = 3500;
             final double spinDuration = 1;
+            final double stopingOffset = 0.25;
             //            final double deceleration = velocity / spinDuration;
-            boolean[] stoppedReels = new boolean[slot.getReels().size()];
+            boolean[] stoppedReels = new boolean[game.getReels().size()];
 
             @Override
             public void handle(long currentTime) {
@@ -96,11 +115,10 @@ public class SlotController extends GameController {
                 double elapsedTime = (currentTime - startTime) / 1_000_000_000.0;
                 previousTime = currentTime;
 
-                for (int nReel = 0; nReel < slot.getReels().size(); nReel++) {
+                for (int nReel = 0; nReel < game.getReels().size(); nReel++) {
                     if (stoppedReels[nReel]) continue;
-                    Reel reel = slot.getReels().get(nReel);
-                    boolean timeStop = elapsedTime > spinDuration + nReel + 1;
-                    stoppedReels[nReel] = reel.reelSpin(deltaTime, velocity, timeStop);
+                    boolean timeStop = elapsedTime > spinDuration + nReel * stopingOffset;
+                    stoppedReels[nReel] = game.getReels().get(nReel).reelSpin(deltaTime, velocity, timeStop);
                 }
 
                 boolean allStopped = true;
@@ -108,7 +126,7 @@ public class SlotController extends GameController {
                     allStopped = allStopped && stopped;
                 if (allStopped) {
                     checkWinner();
-                    slot.getSpinButton().setDisable(GameManager.getInstance().getCurrentPlayer().getBalance() < slot.getMinimumBet());
+                    game.getSpinButton().setDisable(GameManager.getInstance().getCurrentPlayer().getBalance() < CasinoConfiguration.MIN_BET);
                     stop();
                 }
             }
@@ -116,27 +134,36 @@ public class SlotController extends GameController {
         spinTimer.start();
     }
 
-    public void checkWinner() {
-        int numberOfRows = (int) slot.getSlotGridSize().getY();
+    public int checkWinner() {
         int winAmount = 0;
+        List<int[]> winningLines = new ArrayList<>();
 
-        for (int nSymbol = 0; nSymbol < numberOfRows; nSymbol++) {
-            SymbolInfo startingReel = slot.getReels().getFirst().getWinningSymbols().get(nSymbol).getSymbolInfo();
-            int connectedCounter = 1;
-            for (int nReel = 1; nReel < slot.getReels().size(); nReel++) {
-                SymbolInfo currentSymbol = slot.getReels().get(nReel).getWinningSymbols().get(nSymbol).getSymbolInfo();
-                if (currentSymbol.getId().equals(startingReel.getId()))
-                    connectedCounter++;
+        for (int[] payline : game.getPaylines()) {
+            int currentWin = 0;
+            SymbolInfo startSymbol = game.getReels().getFirst().getWinningSymbols().get(payline[0]).getSymbolInfo();
+
+            int connected = 1;
+            for (int reel = 1; reel < game.getReels().size(); reel++) {
+                SymbolInfo current = game.getReels().get(reel).getWinningSymbols().get(payline[reel]).getSymbolInfo();
+                if (current.getId().equals(startSymbol.getId()))
+                    connected++;
                 else break;
             }
-            if (connectedCounter >= 3)
-                winAmount += startingReel.getPayouts()[connectedCounter - 1];
+
+            if (connected >= 3) {
+                currentWin += startSymbol.getPayouts()[connected - 1] * game.getBet();
+                winningLines.add(payline);
+                System.out.println(winAmount);
+            }
+            winAmount += currentWin;
         }
 
         if (winAmount > 0) {
             playerDAO.updateBalance(winAmount);
-            slot.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
+            game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
         }
+
+        return winAmount;
     }
 
 }

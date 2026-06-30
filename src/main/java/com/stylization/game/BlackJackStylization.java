@@ -93,9 +93,5 @@ public class BlackJackStylization {
         standButton.setOnMouseEntered(e -> standButton.setStyle(buttonStyle + buttonHoverStyle));
         standButton.setOnMouseExited(e -> standButton.setStyle(buttonStyle));
 
-        blackJack.getChipShopButton().setStyle(buttonStyle);
-        blackJack.getChipShopButton().setPrefWidth(60);
-        blackJack.getChipShopButton().setPrefHeight(40);
-
     }
 }

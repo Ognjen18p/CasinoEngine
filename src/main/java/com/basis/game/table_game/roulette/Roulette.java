@@ -2,6 +2,7 @@ package com.basis.game.table_game.roulette;
 
 import com.application.GameManager;
 import com.application.utilities.Vector2;
+import com.basis.game.table_game.ChipShop;
 import com.basis.game.table_game.TableGame;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 
 public class Roulette extends TableGame {
 
-    private Field bettingField;
+    private ArrayList<Field> bettingFields;
     private Button spinButton;
     private Layout layout;
     private Wheel wheel;
@@ -19,12 +20,12 @@ public class Roulette extends TableGame {
         return wheel;
     }
 
-    public Field getBettingField() {
-        return bettingField;
+    public ArrayList<Field> getBettingFields() {
+        return bettingFields;
     }
 
-    public void setBettingField(Field bettingField) {
-        this.bettingField = bettingField;
+    public void addBettingField(Field bettingField) {
+        bettingFields.add(bettingField);
     }
 
     public Layout getLayout() {
@@ -33,11 +34,6 @@ public class Roulette extends TableGame {
 
     public Button getSpinButton() {
         return spinButton;
-    }
-
-
-    public Button getChipShopButton() {
-        return chipShopButton;
     }
 
     public Roulette() {
@@ -82,22 +78,18 @@ public class Roulette extends TableGame {
         exitButton.setTranslateY(50);
         exitButton.setPrefWidth(200);
 
-        chipShopButton = new Button("Chip Shop");
-        chipShopButton.setTranslateX(700);
-        chipShopButton.setTranslateY(50);
-
         bettingChips = new ArrayList<>();
+        bettingFields = new ArrayList<>();
+        fillOwningChips(100, 200, 700);
 
-        fillChipSlots(80, 50, 700);
-
-        layout = new Layout(new Vector2(45,55), new Vector2(300, 400));
+        layout = new Layout(new Vector2(45, 55), new Vector2(300, 400));
 
         wheel = new Wheel(new Vector2(600, 600));
         wheel.getTable().setLayoutX(100);
         wheel.getTable().setLayoutY(100);
         wheel.getTable().setVisible(false);
 
-        mainPane.getChildren().addAll(wheel.getTable(), spinButton, layout.getMainPane(),depositButton,  chipShopButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, exitButton, betLabel);
+        mainPane.getChildren().addAll(wheel.getTable(), spinButton, layout.getMainPane(), depositButton, balanceLabel, winLabel, totalWinLabel, lastWinLabel, exitButton, betLabel);
     }
 
 }

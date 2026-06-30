@@ -7,5 +7,6 @@ public abstract class Controller {
     protected abstract void setupEventHandlers();
     protected abstract void initializeScene();
     public abstract void showScene();
+    public void onReset() {}
 }
 

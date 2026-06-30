@@ -52,14 +52,19 @@ public class MenuPageController extends Controller {
         GameManager.getInstance().getMainStage().setTitle("Casino Engine - Main Menu");
     }
 
+    @Override
+    public void onReset() {
+        menuPage.updateBalance(GameManager.getInstance().getCurrentPlayer().getBalance());
+    }
+
     private void handleLogout() {
         menuPage.showErrorMessage("Logging out...");
 
-        GameManager.getInstance().setCurrentController(new LoginPageController());
+        GameManager.getInstance().navigateTo(new LoginPageController());
     }
 
     private void handleDeposit() {
-        GameManager.getInstance().setCurrentController(new CashierPageController());
+        GameManager.getInstance().navigateTo(new CashierPageController());
     }
 
     private void handleChat() {
@@ -89,15 +94,15 @@ public class MenuPageController extends Controller {
     }
 
     private void handleBlackjackSelection() {
-        GameManager.getInstance().setCurrentController(new BlackJackController());
+        GameManager.getInstance().navigateTo(new BlackJackController());
     }
 
     private void handleRouletteSelection() {
-        GameManager.getInstance().setCurrentController(new RouletteController());
+        GameManager.getInstance().navigateTo(new RouletteController());
     }
 
     private void handleSlotsSelection() {
-        GameManager.getInstance().setCurrentController(new SlotController());
+        GameManager.getInstance().navigateTo(new SlotController());
     }
 
 }

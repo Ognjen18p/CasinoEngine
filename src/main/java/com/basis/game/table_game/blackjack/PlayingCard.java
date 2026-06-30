@@ -67,9 +67,9 @@ public class PlayingCard {
     public PlayingCard(Rank rank, Suit suit, double xPos, double yPos) {
         this.rank = rank;
         this.suit = suit;
-        image = new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Cards/" + suit.toString() + "/" + rank.toString() + "of" + suit.toString() + ".png").toExternalForm()));
-        image.setX(xPos);
-        image.setY(yPos);
+        image = new ImageView(new Image(getClass().getResource("/images/TableGames/BlackJackImages/Cards/" + suit.toString() + "/" + rank.toString() + "of" + suit.toString() + ".png").toExternalForm()));
+        image.setLayoutX(xPos);
+        image.setLayoutY(yPos);
         image.setFitHeight(80);
         image.setFitWidth(60);
     }
@@ -78,14 +78,14 @@ public class PlayingCard {
         rank = null;
         suit = null;
         image = new ImageView();
-        image.setX(xPos);
-        image.setY(yPos);
+        image.setLayoutX(xPos);
+        image.setLayoutY(yPos);
     }
 
     public PlayingCard(ImageView image, Rank rank, Suit suit, double xPos, double yPos) {
         this.image = image;
-        this.image.setX(xPos);
-        this.image.setY(yPos);
+        this.image.setLayoutX(xPos);
+        this.image.setLayoutY(yPos);
         this.image.setFitHeight(80);
         this.image.setFitWidth(60);
         this.rank = rank;

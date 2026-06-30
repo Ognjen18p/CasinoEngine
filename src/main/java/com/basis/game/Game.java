@@ -19,9 +19,9 @@ public abstract class Game {
 
     protected int bet;
     protected int lastBet;
-    protected int win;
     protected int totalWins;
-    protected int lastWin;
+    protected double win;
+    protected double lastWin;
 
     protected boolean isPlaying = false;
 
@@ -36,9 +36,9 @@ public abstract class Game {
         mainPane.setPrefSize(GameSettings.getInstance().getWindowWidth(), GameSettings.getInstance().getWindowHeight());
         depositButton = new Button("Deposit");
         exitButton = new Button("Exit");
-        totalWinLabel = new Label(Integer.toString(totalWins));
-        lastWinLabel = new Label(Integer.toString(lastWin));
-        betLabel = new Label(Integer.toString(bet));
+        totalWinLabel = new Label("" + totalWins);
+        lastWinLabel = new Label("" + lastWin);
+        betLabel = new Label("" + bet);
     }
 
     @Override
@@ -53,7 +53,7 @@ public abstract class Game {
     }
 
     public void setBet(int bet) {
-        betLabel.setText(Integer.toString(bet)+ " BET");
+        betLabel.setText(bet + " BET");
         this.bet = bet;
     }
 
@@ -73,13 +73,13 @@ public abstract class Game {
         return totalWins;
     }
 
-    public int getWin() {
+    public double getWin() {
         return win;
     }
 
-    public void setWin(int win) {
+    public void setWin(double win) {
         this.win = win;
-        winLabel.setText(Integer.toString(win)+ " WIN");
+        winLabel.setText(win + " WIN");
     }
 
     public Label getWinLabel() {
@@ -92,7 +92,7 @@ public abstract class Game {
 
     public void setTotalWin(int totalWins) {
         this.totalWins = totalWins;
-        totalWinLabel.setText(Integer.toString(totalWins)+ " TOTAL WIN");
+        totalWinLabel.setText(totalWins + " TOTAL WIN");
     }
 
     public Label getBalanceLabel() {
@@ -100,10 +100,10 @@ public abstract class Game {
     }
 
     public void setBalance(double balance) {
-        balanceLabel.setText(GameManager.getInstance().getCurrentPlayer().getBalance() + " BALANCE");
+        balanceLabel.setText(balance + " BALANCE");
     }
 
-    public int getLastWin() {
+    public double getLastWin() {
         return lastWin;
     }
 

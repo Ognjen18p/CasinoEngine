@@ -5,15 +5,13 @@ import com.controller.Controller;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 public class GameManager {
     private static GameManager instance;
     private Stage mainStage;
     private Player currentPlayer;
-    private Controller currentController;
-    private Controller previousController;
-
-    public GameManager() {
-    }
 
     public static GameManager getInstance() {
         if (instance == null) instance = new GameManager();
@@ -33,15 +31,8 @@ public class GameManager {
         this.currentPlayer = currentPlayer;
     }
 
-    public void setCurrentController(Controller controller) {
-        previousController = currentController;
-        currentController = controller;
-        currentController.showScene();
-    }
-
-    public void returnToPreviousController() {
-        if (previousController != null)
-            setCurrentController(previousController);
+    public void navigateTo(Controller controller) {
+        controller.showScene();
     }
 
     public void setMainScene(Scene scene) {

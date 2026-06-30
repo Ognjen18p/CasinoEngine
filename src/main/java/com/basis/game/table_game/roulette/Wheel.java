@@ -52,7 +52,7 @@ public class Wheel {
         ballTrack.setPrefSize(wheelSize.getX(), wheelSize.getY());
 
         wheelImage = new ImageView();
-        wheelImage.setImage(new Image(getClass().getResource("/images/RouletteImages/wheel.png").toExternalForm()));
+        wheelImage.setImage(new Image(getClass().getResource("/images/TableGames/RouletteImages/wheel.png").toExternalForm()));
         wheelImage.setFitWidth(wheelSize.getX());
         wheelImage.setFitHeight(wheelSize.getY());
 

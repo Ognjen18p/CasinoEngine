@@ -1,15 +1,14 @@
-package com.basis.game.table_game.blackjack;
+package com.basis.game.table_game;
 
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Chip {
-    public static final int[] CHIP_VALUES = {5, 10, 50, 100, 500};
-
     private final int value;
     private boolean isSelected;
     private boolean isDragged;
+    private boolean isPurchased;
     private Button button;
     private ImageView image;
 
@@ -41,11 +40,23 @@ public class Chip {
         isDragged = dragged;
     }
 
-    public Chip(int value, double xPos, double yPos, boolean isButton) {
+    public boolean isPurchased() {
+        return isPurchased;
+    }
+
+    public void setPurchased(boolean purchased) {
+        isPurchased = purchased;
+    }
+
+    public double getSize() {
+        return image.getFitWidth();
+    }
+
+    public Chip(int value, double xPos, double yPos, double size, boolean isButton) {
         this.value = value;
-        image = new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Chips/chip" + value + ".png").toExternalForm(), true));
-        image.setFitHeight(60);
-        image.setFitWidth(60);
+        image = new ImageView(new Image(getClass().getResource("/images/TableGames/Chips/chip" + value + ".png").toExternalForm(), true));
+        image.setFitWidth(size);
+        image.setFitHeight(size);
 
         if (isButton) {
             button = new Button();
@@ -54,14 +65,16 @@ public class Chip {
             button.setLayoutX(xPos);
             button.setLayoutY(yPos);
         } else {
-            image.setX(xPos);
-            image.setY(yPos);
+            image.setLayoutX(xPos);
+            image.setLayoutY(yPos);
         }
     }
 
-    public Chip(int value){
+    public Chip(int value, int size) {
         this.value = value;
-        image = new ImageView(new Image(getClass().getResource("/images/BlackJackImages/Chips/chip" + value + ".png").toExternalForm(), true));
+        image = new ImageView(new Image(getClass().getResource("/images/TableGames/Chips/chip" + value + ".png").toExternalForm(), true));
+        image.setFitWidth(size);
+        image.setFitHeight(size);
     }
 }
 

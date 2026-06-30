@@ -13,6 +13,7 @@ import com.database.person.PlayerDAO;
 import com.database.transaction.TransactionDAO;
 import com.stripe.model.PaymentIntent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextFormatter;
 
 import java.time.LocalDate;
 
@@ -45,80 +46,108 @@ public class PaymentPageController extends Controller {
     }
 
     @Override
-    protected void setupEventHandlers() {
-        paymentPage.getConfirmButton().setOnAction(event -> handlePayment());
-        paymentPage.getBackButton().setOnAction(event ->
-                GameManager.getInstance().returnToPreviousController());
-    }
-
-    @Override
     public void showScene() {
         GameManager.getInstance().setMainScene(scene);
         GameManager.getInstance().getMainStage().setTitle("Casino Engine - Payment");
     }
 
+    @Override
+    protected void setupEventHandlers() {
+        handleCardNumberField();
+handleCardHolderNameField();
+handleCvvNumberField();
+         handlePayment();
+        paymentPage.getBackButton().setOnAction(event -> GameManager.getInstance().navigateTo(new MenuPageController()));
+    }
+
+    private void handleCardNumberField(){
+        paymentPage.getCardNumberField().setTextFormatter(new TextFormatter<>(input -> {
+            if (input.getControlNewText().matches("[0-9]*")) {
+                return input;
+            }
+            return null;
+        }));
+    }
+
+    private void handleCardHolderNameField(){
+        paymentPage.getCardHolderNameField().setTextFormatter(new TextFormatter<>(input -> {
+            if (input.getControlNewText().matches("[a-zA-Z]*")) {
+                return input;
+            }
+            return null;
+        }));
+    }
+
+    private void handleCvvNumberField   (){
+        paymentPage.getCvvField().setTextFormatter(new TextFormatter<>(input -> {
+            if (input.getControlNewText().matches("[0-9]*")) {
+                return input;
+            }
+            return null;
+        }));
+    }
+
     private void handlePayment() {
-        String cardNumber = paymentPage.getCardNumberField().getText().replace(" ", "");
-        String cardHolderName = paymentPage.getCardHolderNameField().getText();
-        String cvv = paymentPage.getCvvField().getText();
-        int expiryMonth = paymentPage.getMonthExpiryField().getValue();
-        int expiryYear = paymentPage.getYearExpiryField().getValue();
-        int personId = GameManager.getInstance().getCurrentPlayer().getId();
+        paymentPage.getConfirmButton().setOnAction(event -> {
+            String cardNumber = paymentPage.getCardNumberField().getText().trim();
+            String cardHolderName = paymentPage.getCardHolderNameField().getText();
+            String cvv = paymentPage.getCvvField().getText();
+            int expiryMonth = paymentPage.getMonthExpiryField().getValue();
+            int expiryYear = paymentPage.getYearExpiryField().getValue();
+            int personId = GameManager.getInstance().getCurrentPlayer().getId();
 
-        if (!cardValidator.isNameValid(cardHolderName) || !cardValidator.isNumberValid(cardNumber) ||
-                !cardValidator.isCvvValid(cvv) || !cardValidator.isExpired(expiryMonth, expiryYear)) {
-            paymentPage.showErrorMessage(cardValidator.getErrorMessage());
-            return;
-        }
-
-        try {
-            String paymentMethodId = StripeService.createPaymentMethodId("tok_visa");
-
-            PaymentIntent paymentIntent = StripeService.createPaymentIntent(amount, paymentMethodId);
-
-            if (!StripeService.confirmPayment(paymentIntent.getId())) {
-                paymentPage.showErrorMessage("Payment declined");
-                saveTransaction(Transaction.Status.DECLINED, personId, -1);
+            if (!cardValidator.isNameValid(cardHolderName) || !cardValidator.isNumberValid(cardNumber) ||
+                    !cardValidator.isCvvValid(cvv) || !cardValidator.isExpired(expiryMonth, expiryYear)) {
+                paymentPage.showErrorMessage(cardValidator.getErrorMessage());
                 return;
             }
 
-            Card card = new Card(personId, cardNumber, cardHolderName, LocalDate.of(expiryYear, expiryMonth, 1));
+            try {
+                String paymentMethodId = StripeService.createPaymentMethodId("tok_visa");
+//            String paymentMethodId = StripeService.createPaymentMethodId("tok_chargeDeclined");
+                PaymentIntent paymentIntent = StripeService.createPaymentIntent(amount, paymentMethodId);
 
-            if (!cardDAO.cardExists(personId, card))
-                cardDAO.saveCard(personId, card);
-            int cardId = cardDAO.getCardId(personId, card);
-
-            saveTransaction(Transaction.Status.APPROVED, personId, cardId);
-
-            if (type == Transaction.Type.DEPOSIT) {
-                double newBalance = GameManager.getInstance().getCurrentPlayer().getBalance() + amount;
-                if (playerDAO.updateBalance(newBalance))
-                    GameManager.getInstance().getCurrentPlayer().setBalance(newBalance);
-                else
-                    paymentPage.showErrorMessage("Balance update failed!");
-            } else {
-                double currentBalance = GameManager.getInstance().getCurrentPlayer().getBalance();
-                if (currentBalance < amount) {
-                    paymentPage.showErrorMessage("Not enough balance!");
+                if (paymentIntent == null || !StripeService.confirmPayment(paymentIntent.getId())) {
+                    paymentPage.showErrorMessage("Payment declined");
+                    saveTransaction(Transaction.Status.DECLINED, personId, 0);
                     return;
                 }
-                double newBalance = currentBalance - amount;
-                if (playerDAO.updateBalance(newBalance))
-                    GameManager.getInstance().getCurrentPlayer().setBalance(newBalance);
-                else
-                    paymentPage.showErrorMessage("Balance update failed!");
+                Card card = new Card(personId, cardNumber, cardHolderName, LocalDate.of(expiryYear, expiryMonth, 1));
+
+                if (!cardDAO.cardExists(personId, card))
+                    cardDAO.saveCard(personId, card);
+                int cardId = cardDAO.getCardId(personId, card);
+
+                saveTransaction(Transaction.Status.APPROVED, personId, cardId);
+
+                if (type == Transaction.Type.DEPOSIT) {
+                    if (playerDAO.updateBalance(amount))
+                        paymentPage.showErrorMessage("Balance updated successfully");
+                    else
+                        paymentPage.showErrorMessage("Balance update failed");
+                } else {
+                    if (GameManager.getInstance().getCurrentPlayer().getBalance() < amount) {
+                        paymentPage.showErrorMessage("Not enough balance!");
+                        return;
+                    }
+                    if (playerDAO.updateBalance(-amount))
+                        paymentPage.showErrorMessage("Balance updated successfully");
+                    else
+                        paymentPage.showErrorMessage("Balance update failed!");
+                }
+
+                GameManager.getInstance().navigateTo(new CashierPageController());
+
+            } catch (Exception exception) {
+                paymentPage.showErrorMessage("Payment error: " + exception.getMessage());
             }
-
-            GameManager.getInstance().returnToPreviousController();
-
-        } catch (Exception exception) {
-            paymentPage.showErrorMessage("Payment error: " + exception.getMessage());
-        }
+        });
     }
 
     private void saveTransaction(Transaction.Status status, int personId, int cardId) {
         Transaction transaction = new Transaction(cardId, personId, amount, status, type);
-        transactionDAO.createTransaction(transaction);
+        if(!transactionDAO.createTransaction(transaction))
+            paymentPage.showErrorMessage(transactionDAO.getErrorMessage());
     }
 
 }

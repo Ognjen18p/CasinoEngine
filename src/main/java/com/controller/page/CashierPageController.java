@@ -7,6 +7,7 @@ import com.basis.page.CashierPage;
 import com.basis.transaction.Transaction;
 import com.controller.Controller;
 import javafx.scene.Scene;
+import javafx.scene.control.TextFormatter;
 
 public class CashierPageController extends Controller {
     private CashierPage cashierPage;
@@ -18,9 +19,10 @@ public class CashierPageController extends Controller {
 
     @Override
     protected void setupEventHandlers() {
+        handleAmountField();
         handleDeposit();
         handleWithdraw();
-        handleBack();
+        handleExit();
     }
 
     @Override
@@ -46,7 +48,8 @@ public class CashierPageController extends Controller {
                 cashierPage.showErrorMessage("Minimum deposit amount is: " + CasinoConfiguration.MIN_DEPOSIT);
                 return;
             }
-            GameManager.getInstance().setCurrentController(new PaymentPageController(Double.parseDouble(cashierPage.getAmountField().getText()), Transaction.Type.DEPOSIT));
+            GameManager.getInstance().navigateTo(new PaymentPageController(Double.parseDouble(cashierPage.getAmountField().getText()),
+                    Transaction.Type.DEPOSIT));
         });
     }
 
@@ -60,13 +63,22 @@ public class CashierPageController extends Controller {
                 cashierPage.showErrorMessage("Minimum withdraw amount is: " + CasinoConfiguration.MIN_WITHDRAW);
                 return;
             }
-            GameManager.getInstance().setCurrentController(new PaymentPageController(Double.parseDouble(cashierPage.getAmountField().getText()), Transaction.Type.WITHDRAW));
+            GameManager.getInstance().navigateTo(new PaymentPageController(Double.parseDouble(cashierPage.getAmountField().getText()),
+                    Transaction.Type.WITHDRAW));
         });
     }
 
-    private void handleBack(){
-        cashierPage.getBackButton().setOnAction(event -> {
-            GameManager.getInstance().returnToPreviousController();
+    private void handleExit() {
+        cashierPage.getExitButton().setOnAction(event -> {
+            GameManager.getInstance().navigateTo(new MenuPageController());
         });
+    }
+
+    private void handleAmountField(){
+        cashierPage.getAmountField().setTextFormatter(new TextFormatter<>(input -> {
+            if(input.getControlNewText().matches("[0-9]*"))
+                return input;
+            return null;
+        }));
     }
 }

@@ -1,152 +1,170 @@
 package com.basis.game.table_game;
 
 import com.application.GameManager;
-import com.basis.game.Game;
-import com.basis.game.table_game.blackjack.Chip;
+import com.application.configuration.CasinoConfiguration;
+import com.application.utilities.Vector2;
+import com.database.person.PlayerDAO;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 
 public class ChipShop {
-    private Game game;
     private final HBox mainPane;
+    private final TableGame game;
+    private final Label instructionLabel;
+    private final Button openButton;
+    private final PlayerDAO playerDAO;
     private ArrayList<Chip> availableChips;
-    private final ObservableList<Chip> destinationChips;
+    private String errorMessage;
 
-    public ChipShop(TableGame game) {
+    public ChipShop(TableGame game, PlayerDAO playerDAO, Vector2 openButtonPosition, Vector2 instructionLabelPosition) {
         this.game = game;
-        this.destinationChips = game.getOwningChips();
+        this.playerDAO = playerDAO;
+        instructionLabel = new Label("Left click to purchase \n Right click to sell");
+        instructionLabel.setLayoutX(instructionLabelPosition.getX());
+        instructionLabel.setLayoutY(instructionLabelPosition.getY());
+        openButton = new Button("Open Chip Shop");
+        openButton.setLayoutX(openButtonPosition.getX());
+        openButton.setLayoutY(openButtonPosition.getY());
         mainPane = new HBox(10);
         mainPane.setPadding(new Insets(10));
-        mainPane.setStyle(
-                "-fx-background-color: rgba(0,0,0,0.75);" +
-                        "-fx-background-radius: 12;" +
-                        "-fx-border-color: #FFD700;" +
-                        "-fx-border-radius: 12;" +
-                        "-fx-border-width: 2;"
-        );
         mainPane.setVisible(false);
-        game.getMainPane().getChildren().add(mainPane);
-        fillShopChipsAndEvents();
+        game.getMainPane().getChildren().addAll(mainPane, openButton);
+        addShopChipsAndBuyingEvents();
+        styleShop();
+        shopOpening();
+    }
+
+    public PlayerDAO getPlayerDAO() {
+        return playerDAO;
     }
 
     public HBox getMainPane() {
         return mainPane;
     }
 
-    private String shopButtonStyle() {
-        return "-fx-background-color: linear-gradient(to bottom, #FFD700, #FFA500);" +
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public Label getInstructionLabel() {
+        return instructionLabel;
+    }
+
+    public Button getOpenButton() {
+        return openButton;
+    }
+
+    public ArrayList<Chip> getAvailableChips() {
+        return availableChips;
+    }
+
+    private void styleShop() {
+        openButton.setStyle("-fx-background-color: linear-gradient(to bottom, #FFD700, #FFA500);" +
                 "-fx-text-fill: #000000;" +
                 "-fx-font-size: 12px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-background-radius: 6;" +
                 "-fx-cursor: hand;" +
-                "-fx-min-width: 24px;" +
-                "-fx-min-height: 24px;" +
-                "-fx-max-width: 24px;" +
-                "-fx-max-height: 24px;" +
-                "-fx-padding: 0;";
+                "-fx-max-width: 100px;" +
+                "-fx-max-height: 80px;" +
+                "-fx-padding: 0;"
+        );
+        mainPane.setStyle("-fx-background-color: rgba(0,0,0,0.75);" +
+                "-fx-background-radius: 12;" +
+                "-fx-border-color: #FFD700;" +
+                "-fx-border-radius: 12;" +
+                "-fx-border-width: 2;"
+        );
     }
 
-    private void fillShopChipsAndEvents() {
+    private void shopOpening() {
+        openButton.setOnAction(event -> {
+            mainPane.setVisible(!mainPane.isVisible());
+        });
+    }
+
+    private void addShopChipsAndBuyingEvents() {
         availableChips = new ArrayList<>();
-        for (int bettingValue : Chip.CHIP_VALUES) {
-            VBox boxPane = new VBox(4);
-            boxPane.setPadding(new Insets(6));
-            boxPane.setStyle(
-                    "-fx-background-color: rgba(255,255,255,0.08);" +
-                            "-fx-background-radius: 8;"
-            );
-            boxPane.setAlignment(javafx.geometry.Pos.CENTER);
-
-            Label valueLabel = new Label(bettingValue + "");
-            valueLabel.setStyle(
-                    "-fx-text-fill: #FFD700;" +
-                            "-fx-font-size: 11px;" +
-                            "-fx-font-weight: bold;"
-            );
-
-            Chip nChip = new Chip(bettingValue);
-            nChip.getImage().setFitWidth(40);
-            nChip.getImage().setFitHeight(40);
+        for (int bettingValue : CasinoConfiguration.BETTING_VALUES) {
+            Chip nChip = new Chip(bettingValue, 0, 0, 50, true);
             availableChips.add(nChip);
+            mainPane.getChildren().add(nChip.getButton());
 
-            HBox buttons = new HBox(6);
-            buttons.setAlignment(javafx.geometry.Pos.CENTER);
-
-            Button minus = new Button("-");
-            minus.setStyle(shopButtonStyle());
-
-            Button plus = new Button("+");
-            plus.setStyle(shopButtonStyle());
-
-            plus.setOnMouseClicked(event -> {
-                if (GameManager.getInstance().getCurrentPlayer().getBalance() > bettingValue) {
-                    Chip newChip = new Chip(bettingValue, 0, 0, true);
-                    game.getMainPane().getChildren().add(newChip.getButton());
-                    game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() - bettingValue);
-                    addChipTransition(newChip);
-                }
-            });
-
-            minus.setOnMouseClicked(event -> {
-                for (Chip chip : destinationChips) {
-                    if (chip.getValue() == bettingValue && chip.getButton() != null) {
-                        removeChipTransition(chip);
-                        game.setBalance(GameManager.getInstance().getCurrentPlayer().getBalance() + bettingValue);
-                        break;
+            nChip.getButton().setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    if (!nChip.isPurchased()) {
+                        if (GameManager.getInstance().getCurrentPlayer().getBalance() >= bettingValue) {
+                            Chip purchasedChip = new Chip(bettingValue, 0, 0, 50, true);
+                            double newBalance = GameManager.getInstance().getCurrentPlayer().getBalance() - bettingValue;
+                            GameManager.getInstance().getCurrentPlayer().addChip(bettingValue);
+                            GameManager.getInstance().getCurrentPlayer().setBalance(newBalance);
+                            if (!playerDAO.purchaseAndSaleChip(-bettingValue))
+                                System.out.println(playerDAO.getErrorMessage());
+                            game.setBalance(newBalance);
+                            game.getMainPane().getChildren().add(purchasedChip.getButton());
+                            purchaseChipTransition(purchasedChip);
+                            return;
+                        }
+                        errorMessage = "Not enough credit!";
                     }
                 }
             });
-
-            buttons.getChildren().addAll(minus, plus);
-            boxPane.getChildren().addAll(valueLabel, nChip.getImage(), buttons);
-            mainPane.getChildren().add(boxPane);
         }
     }
 
-    private void addChipTransition(Chip chip) {
+    private void purchaseChipTransition(Chip purchasedChip) {
         Chip destinationChip = null;
-        for (Chip nChip : destinationChips) {
-            if (nChip.getButton() == null && chip.getValue() == nChip.getValue()) {
+        for (Chip nChip : game.getOwningChips()) {
+            if (nChip.getButton() == null && purchasedChip.getValue() == nChip.getValue()) {
                 destinationChip = nChip;
                 break;
             }
         }
         if (destinationChip == null) return;
-        chip.getButton().setTranslateX(0);
-        chip.getButton().setTranslateY(0);
-        Timeline transition = new Timeline(
-                new KeyFrame(Duration.millis(300),
-                new KeyValue(chip.getButton().layoutXProperty(), destinationChip.getImage().getX()),
-                new KeyValue(chip.getButton().layoutYProperty(), destinationChip.getImage().getY())
-        ));
-        transition.setOnFinished(event -> destinationChips.add(chip));
-        transition.play();
+
+        purchasedChip.getButton().setTranslateX(0);
+        purchasedChip.getButton().setTranslateY(0);
+        Timeline timelineTransition = new Timeline(
+                new KeyFrame(Duration.millis(500),
+                        new KeyValue(purchasedChip.getButton().layoutXProperty(), destinationChip.getImage().getLayoutX()),
+                        new KeyValue(purchasedChip.getButton().layoutYProperty(), destinationChip.getImage().getLayoutY())
+                ));
+        timelineTransition.setOnFinished(event -> {
+            game.getOwningChips().add(purchasedChip);
+            purchasedChip.setPurchased(true);
+        });
+        timelineTransition.play();
     }
 
-    private void removeChipTransition(Chip chip) {
-        if (chip.getButton() == null) return;
-        chip.getButton().setTranslateX(0);
-        chip.getButton().setTranslateY(0);
-        Timeline transition = new Timeline(
-                new KeyFrame(Duration.millis(300),
-                        new KeyValue(chip.getButton().layoutXProperty(), mainPane.getLayoutX()),
-                        new KeyValue(chip.getButton().layoutYProperty(), mainPane.getLayoutY())
-                ));
-        transition.setOnFinished(event -> {
-            destinationChips.remove(chip);
-            game.getMainPane().getChildren().remove(chip.getButton());
-        });
-        transition.play();
+    public void sellChipTransition(Chip sellingChip) {
+        if (sellingChip.isPurchased()) {
+            if (sellingChip.isSelected())
+                game.setBet(game.getBet() - sellingChip.getValue());
+
+            double newBalance = GameManager.getInstance().getCurrentPlayer().getBalance() + sellingChip.getValue();
+            GameManager.getInstance().getCurrentPlayer().removeFromOwningChips(sellingChip.getValue());
+            GameManager.getInstance().getCurrentPlayer().setBalance(newBalance);
+            if (!playerDAO.purchaseAndSaleChip(-sellingChip.getValue()))
+                System.out.println(playerDAO.getErrorMessage());
+            game.setBalance(newBalance);
+            Timeline timelineTransition = new Timeline(new KeyFrame(Duration.millis(500),
+                    new KeyValue(sellingChip.getButton().layoutYProperty(), -100)
+            ));
+            timelineTransition.setOnFinished(event -> {
+                sellingChip.getButton().setDisable(true);
+                game.getOwningChips().remove(sellingChip);
+                game.getMainPane().getChildren().remove(sellingChip.getButton());
+            });
+            timelineTransition.play();
+        }
     }
 }

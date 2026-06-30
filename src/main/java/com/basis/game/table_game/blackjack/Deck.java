@@ -9,10 +9,10 @@ public class Deck {
     private final int NUMBER_OF_RANKS = 13;
     private final int NUMBER_OF_SUITS = 4;
     private final int NUMBER_OF_DECKS = 6;
+    private final Vector2 position;
     private int firstInDeck = 0;
-    private Vector2 position;
 
-    private ArrayList<PlayingCard> cards = new ArrayList<>();
+    private final ArrayList<PlayingCard> cards = new ArrayList<>();
 
     public Deck(Vector2 position) {
         this.position = position;

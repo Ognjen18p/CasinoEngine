@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage mainStage) {
         DatabaseManager.initialize("jdbc:mysql://localhost:3306/casino_engine", "root", "");
         GameManager.getInstance().initializeElements(mainStage);
-        new LoginPageController().showScene();
+        GameManager.getInstance().navigateTo(new LoginPageController());
     }
 
     public static void main(String[] args) {

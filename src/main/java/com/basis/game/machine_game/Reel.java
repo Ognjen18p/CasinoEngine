@@ -3,6 +3,7 @@ package com.basis.game.machine_game;
 import com.application.utilities.Vector2;
 import com.basis.game.machine_game.symbols.Symbol;
 import com.basis.game.machine_game.symbols.SymbolType;
+import javafx.animation.AnimationTimer;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
@@ -51,7 +52,7 @@ public class Reel {
 
     private SymbolType getRandomSymbolType() {
         Random rand = new Random();
-        int random = rand.nextInt(101);
+        int random = rand.nextInt(100);
         int cumulation = 0;
         for (SymbolType type : SymbolType.values()) {
             cumulation += type.getProbability();
@@ -93,10 +94,11 @@ public class Reel {
             double bottomBound = position.getY() + numberOfCells * width;
             double topBound = position.getY();
 
-            if (positionY >= topBound && positionY <= topBound + (double) width / 3 && stopSpin && winningPane == symbolPane) {
-                symbolPane.setLayoutY(topBound);
+            if (stopSpin) {
+                winningPane.setLayoutY(topBound);
+                winningPane.setVisible(true);
                 for(Pane otherPane : symbolPanes) {
-                    if(!otherPane.equals(symbolPane))
+                    if(!otherPane.equals(winningPane))
                         otherPane.setVisible(false);
                 }
                 return true;
@@ -109,7 +111,7 @@ public class Reel {
             }
             double newPosition = positionY + velocity * deltaTime;
             symbolPane.setLayoutY(newPosition);
-            symbolPane.setVisible(!(positionY < -(double)(numberOfCells * width) / 2) && !(positionY >= bottomBound));
+            symbolPane.setVisible(!(positionY <= -numberOfCells * width) && !(positionY >= bottomBound));
         }
         return false;
     }

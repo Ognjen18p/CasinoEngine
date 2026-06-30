@@ -1,5 +1,7 @@
 package com.application.security;
 
+import com.application.configuration.CasinoConfiguration;
+
 import static com.application.configuration.CasinoConfiguration.*;
 
 import java.util.HashMap;
@@ -12,6 +14,10 @@ public class LoginAttemptSecurity {
     private static final HashMap<String, Long> lockedTimes = new HashMap<>();
     private String errorMessage;
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
     public static LoginAttemptSecurity getInstance() {
         if (instance == null) instance = new LoginAttemptSecurity();
         return instance;
@@ -22,7 +28,7 @@ public class LoginAttemptSecurity {
         loginAttempts.put(username, attempts);
 
         if (attempts >= MAX_LOGIN_ATTEMPTS) {
-            lockedTimes.put(username, System.currentTimeMillis() + LOCK_DURATION);
+            lockedTimes.put(username, System.currentTimeMillis() + CasinoConfiguration.LOCK_DURATION);
         }
 
         /// Save to DB out time! !!!!!!!!!! /////////

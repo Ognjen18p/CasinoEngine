@@ -9,7 +9,7 @@ public class VerificatonService {
     private static VerificatonService instance;
     private static final HashMap<String, String> pendingVerifications = new HashMap<>();
     private static final HashMap<String, Long> tokenExpiry = new HashMap<>();
-    private String errorMessage = "";
+    private String errorMessage;
 
     public String getErrorMessage() {
         return errorMessage;
@@ -27,7 +27,6 @@ public class VerificatonService {
         tokenExpiry.put(email, expiryTime);
         return token;
     }
-
 
     public boolean verifyToken(String email, String token) {
         String existingPendingToken =  pendingVerifications.get(email);

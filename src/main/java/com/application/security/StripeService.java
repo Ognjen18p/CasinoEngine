@@ -7,7 +7,6 @@ import com.stripe.net.RequestOptions;
 import com.stripe.param.*;
 
 public class StripeService {
-
     private static final String API_KEY = "sk_test_51Taa0JF6eeLVF3rodSDMYVTXG76M9UFLOPIVY8l7TlS1bVrmnEakhPcTyiIuRMN1JyQzA6MF76rm2FkFjp7GZQQ900ogSKxDOz";
 
     public static String createPaymentMethodId(String token) {
@@ -20,7 +19,7 @@ public class StripeService {
             return PaymentMethod.create(paymentParams, requestOptions).getId();
         } catch (StripeException exception) {
             System.out.println(exception.getMessage());
-            throw new RuntimeException("Unable to create payment method: " + exception.getMessage());
+            return exception.getMessage();
         }
     }
 
@@ -41,7 +40,7 @@ public class StripeService {
             System.out.println("Uspelo! intent");
             return PaymentIntent.create(paymentParams, requestOptions);
         } catch (StripeException exception) {
-            throw new RuntimeException("Unable to create PaymentIntent: " + exception.getMessage());
+            return null;
         }
     }
 
@@ -52,7 +51,7 @@ public class StripeService {
             System.out.println("Uspelo!");
             return paymentIntent.getStatus().equals("succeeded");
         } catch (StripeException exception) {
-            throw new RuntimeException("Payment acceptance failed: " + exception.getMessage());
+            return false;
         }
     }
 

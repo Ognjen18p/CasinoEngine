@@ -1,6 +1,7 @@
 package com.basis.game.table_game.roulette;
 
 import com.application.utilities.Vector2;
+import com.basis.game.table_game.Chip;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -26,9 +27,11 @@ public class Field {
     public static final ArrayList<Integer> BLACK_NUMBERS = new ArrayList<>(
             List.of(2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35)
     );
+
     private boolean isSelected;
     private int winMultiplier;
-    private ArrayList<Integer> winValues;
+    private final ArrayList<Integer> coveredNumbers;
+    private ArrayList<Chip> coveredChips;
 
     private final FieldType fieldType;
     private final Vector2 position;
@@ -38,6 +41,14 @@ public class Field {
     private Button button;
     private StackPane stackPane;
 
+    public ArrayList<Chip> getCoveredChips() {
+        return coveredChips;
+    }
+
+    public void setCoveredChip(ArrayList<Chip> coveredChips) {
+        this.coveredChips = coveredChips;
+    }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -46,8 +57,8 @@ public class Field {
         return winMultiplier;
     }
 
-    public ArrayList<Integer> getWinValues() {
-        return winValues;
+    public ArrayList<Integer> getCoveredNumbers() {
+        return coveredNumbers;
     }
 
     public ArrayList<Field> getConnectedFields() {
@@ -71,7 +82,8 @@ public class Field {
         this.connectedFields = connectedFields;
         this.position = position;
         size = new Vector2(25, 32);
-        winValues = new ArrayList<>();
+        coveredChips = new ArrayList<>();
+        coveredNumbers = new ArrayList<>();
         connectedBet();
         connectedValues();
     }
@@ -81,7 +93,8 @@ public class Field {
         this.fieldType = fieldType;
         this.connectedFields = connectedFields;
         this.position = position;
-        winValues = new ArrayList<>();
+        coveredNumbers = new ArrayList<>();
+        coveredChips = new ArrayList<>();
         changeType();
         connectedValues();
     }
@@ -90,7 +103,8 @@ public class Field {
         this.fieldType = fieldType;
         this.size = size;
         this.position = position;
-        winValues = new ArrayList<>();
+        coveredChips = new ArrayList<>();
+        coveredNumbers = new ArrayList<>();
         changeType();
     }
 
@@ -134,7 +148,7 @@ public class Field {
 
     private void connectedValues() {
         for (Field field : connectedFields) {
-            winValues.addAll(field.getWinValues());
+            coveredNumbers.addAll(field.coveredNumbers);
         }
     }
 
@@ -148,7 +162,7 @@ public class Field {
         text.setFill(Color.WHITE);
         text.setRotate(-90);
         button.setGraphic(text);
-        winValues.add(0);
+        coveredNumbers.add(0);
         winMultiplier = 36;
     }
 
@@ -171,7 +185,7 @@ public class Field {
         stackPane.setLayoutX(position.getX());
         stackPane.setLayoutY(position.getY());
         stackPane.getChildren().addAll(button, numberLabel);
-        winValues.add(number);
+        coveredNumbers.add(number);
         winMultiplier = 36;
     }
 
